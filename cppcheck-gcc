@@ -1,12 +1,21 @@
 #!/bin/bash
+SELF="$0"
 
 CPPCHECK_DEF_ARGS="--template=gcc --inline-suppr -I/usr/include -D__x86_64__"
 
 test -n "$CPPCHECK"      || CPPCHECK="cppcheck"
 test -n "$CPPCHECK_ARGS" || CPPCHECK_ARGS="$CPPCHECK_DEF_ARGS"
 
+error() {
+    printf "%s: error: %s\n" "$SELF" "$*" >&2
+}
+
 pick_defs_and_incs() {
     for i in "$@"; do
+        if printf "%s\n" "$i" | grep '^-include' >/dev/null; then
+            error "the -include option is not supported by cppcheck yet"
+        fi
+
         printf " %s\n" "$i" | grep -E '^ (-D|-I)' | tr -d '\n'
     done
 }
