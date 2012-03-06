@@ -1,0 +1,43 @@
+#!/bin/bash
+
+CPPCHECK_DEF_ARGS="--template=gcc --inline-suppr -I/usr/include -D__x86_64__"
+
+test -n "$CPPCHECK"      || CPPCHECK="cppcheck"
+test -n "$CPPCHECK_ARGS" || CPPCHECK_ARGS="$CPPCHECK_DEF_ARGS"
+
+pick_defs_and_incs() {
+    for i in "$@"; do
+        printf " %s\n" "$i" | grep -E '^ (-D|-I)' | tr -d '\n'
+    done
+}
+
+pick_source_files() {
+    for i in "$@"; do
+        printf " %s\n" "$i" | grep -E '\.(c|C|cc|cpp|cxx)$' | tr -d '\n'
+    done
+}
+
+run_cmd() {
+    printf "+ %s\n" "$*"
+    "$@"
+}
+
+run_cppcheck() {
+    C_FILES="`pick_source_files "$@"`"
+    test -n "$C_FILES" || return 1
+
+    if printf "%s\n" "$C_FILES" | grep 'CMakeFiles/CMakeTmp/testCXXCompiler.cxx'
+    then
+        # avoid a panic of CMake when checking basic functionality of CXX
+        return 0
+    fi
+
+    run_cmd "$CPPCHECK" ${CPPCHECK_ARGS} `pick_defs_and_incs "$@"` $C_FILES
+}
+
+CC="/usr/bin/`basename "$0"`"
+run_cmd "$CC" "$@"
+EC=$?
+
+run_cppcheck "$@"
+exit $EC
