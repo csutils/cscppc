@@ -10,9 +10,13 @@ error() {
     printf "%s: error: %s\n" "$SELF" "$*" >&2
 }
 
+match() {
+    grep "$@" > /dev/null
+}
+
 pick_defs_and_incs() {
     for i in "$@"; do
-        if printf "%s\n" "$i" | grep '^-include' >/dev/null; then
+        if printf "%s\n" "$i" | match '^-include'; then
             error "the -include option is not supported by cppcheck yet"
         fi
 
@@ -27,7 +31,7 @@ pick_source_files() {
 }
 
 run_cmd() {
-    printf "+ %s\n" "$*"
+    #printf "+ %s\n" "$*"
     "$@"
 }
 
@@ -35,7 +39,12 @@ run_cppcheck() {
     C_FILES="`pick_source_files "$@"`"
     test -n "$C_FILES" || return 1
 
-    if printf "%s\n" "$C_FILES" | grep 'CMakeFiles/CMakeTmp/testCXXCompiler.cxx'
+    if printf "%s\n" "$C_FILES" | match 'conftest.c'; then
+        # avoid unnecessary delays when running autoconf checks
+        return 0
+    fi
+
+    if printf "%s\n" "$C_FILES" | match 'CMakeFiles/CMakeTmp/testCXXCompiler.cxx'
     then
         # avoid a panic of CMake when checking basic functionality of CXX
         return 0
