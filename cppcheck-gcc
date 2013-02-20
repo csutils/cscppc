@@ -53,7 +53,7 @@ run_cppcheck() {
         return 0
     fi
 
-    run_cmd "$CPPCHECK" ${CPPCHECK_ARGS} `pick_defs_and_incs "$@"` $C_FILES
+    run_cmd "$CPPCHECK" `pick_defs_and_incs "$@"` ${CPPCHECK_ARGS} $C_FILES
 }
 
 CC="/usr/bin/`basename "$0"`"
