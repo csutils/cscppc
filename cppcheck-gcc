@@ -17,12 +17,12 @@ match() {
 pick_defs_and_incs() {
     while [ 0 -lt $# ]; do
         if printf "%s\n" "$1" | match '^-include$'; then
-            printf " --include=%s" "$2"
+            printf " '--include=%s'" "$2"
             shift; shift
             continue
         fi
 
-        printf " %s\n" "$1" | grep -E '^ (-D|-I)' | tr -d '\n'
+        printf " '%s'\n" "$1" | grep -E "^ '(-D|-I)" | tr -d '\n'
         shift
     done
 }
@@ -34,7 +34,14 @@ pick_source_files() {
 }
 
 run_cmd() {
-    #printf "+ %s\n" "$*"
+    if test -w /dev/fd/3; then
+        printf "+" >&3
+        for i in "$@"; do
+            printf " '%s'" "$i" >&3
+        done
+        printf "\n" >&3
+    fi
+
     "$@"
 }
 
@@ -53,7 +60,7 @@ run_cppcheck() {
         return 0
     fi
 
-    run_cmd "$CPPCHECK" `pick_defs_and_incs "$@"` ${CPPCHECK_ARGS} $C_FILES
+    eval run_cmd "$CPPCHECK" `pick_defs_and_incs "$@"` ${CPPCHECK_ARGS} $C_FILES
 }
 
 CC="/usr/bin/`basename "$0"`"
