@@ -1,7 +1,10 @@
 #!/bin/bash
 SELF="$0"
 
-CPPCHECK_DEF_ARGS="--template=gcc --inline-suppr -I/usr/include -D__x86_64__"
+# FIXME: this is not going to work well when cross-compiling
+ARCH_DEF="-D__`uname -i`__"
+
+CPPCHECK_DEF_ARGS="--template=gcc --inline-suppr -I/usr/include $ARCH_DEF"
 
 test -n "$CPPCHECK"      || CPPCHECK="cppcheck"
 test -n "$CPPCHECK_ARGS" || CPPCHECK_ARGS="$CPPCHECK_DEF_ARGS"
