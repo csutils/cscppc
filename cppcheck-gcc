@@ -4,7 +4,9 @@ SELF="$0"
 # FIXME: this is not going to work well when cross-compiling
 ARCH_DEF="-D__`uname -i`__"
 
-CPPCHECK_DEF_ARGS="--template=gcc --inline-suppr -I/usr/include $ARCH_DEF"
+CPPCHECK_TEMPLATE="'{file}:{line}: {severity}: {id}: {message}'"
+CPPCHECK_DEF_ARGS="--template=$CPPCHECK_TEMPLATE --inline-suppr"
+CPPCHECK_DEF_ARGS="$CPPCHECK_DEF_ARGS -I/usr/include $ARCH_DEF"
 
 test -n "$CPPCHECK"      || CPPCHECK="cppcheck"
 test -n "$CPPCHECK_ARGS" || CPPCHECK_ARGS="$CPPCHECK_DEF_ARGS"
