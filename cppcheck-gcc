@@ -39,7 +39,15 @@ match() {
 pick_defs_and_incs() {
     while [ 0 -lt $# ]; do
         if printf "%s\n" "$1" | match '^-include$'; then
+            # gcc -include
             printf " '--include=%s'" "$2"
+            shift; shift
+            continue
+        fi
+
+        if printf "%s\n" "$1" | match -E '^-i(quote|system)$'; then
+            # gcc -iquote/-isystem
+            printf " '-I%s'" "$2"
             shift; shift
             continue
         fi
