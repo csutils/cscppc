@@ -22,7 +22,7 @@ ARCH_DEF="-D__`uname -i`__"
 
 CPPCHECK_TEMPLATE="'{file}:{line}: {severity}: {id}: {message}'"
 CPPCHECK_DEF_ARGS="--template=$CPPCHECK_TEMPLATE --inline-suppr"
-CPPCHECK_DEF_ARGS="$CPPCHECK_DEF_ARGS -I/usr/include $ARCH_DEF"
+CPPCHECK_DEF_ARGS="$CPPCHECK_DEF_ARGS $ARCH_DEF --quiet"
 
 CPPCHECK_SUPPLIST="/usr/share/cppcheck-gcc/default.supp"
 if test -r "$CPPCHECK_SUPPLIST"; then
@@ -55,13 +55,17 @@ pick_source_files() {
     done
 }
 
+debug_cmd() {
+    printf "+"
+    for i in "$@"; do
+        printf " '%s'" "$i"
+    done
+    printf "\n"
+}
+
 run_cmd() {
-    if test -w /dev/fd/3; then
-        printf "+" >&3
-        for i in "$@"; do
-            printf " '%s'" "$i" >&3
-        done
-        printf "\n" >&3
+    if test -n "$CPPCHECK_DEBUG_FD" && test -w "/dev/fd/$CPPCHECK_DEBUG_FD"; then
+        debug_cmd "$@" >&"$CPPCHECK_DEBUG_FD"
     fi
 
     "$@"
