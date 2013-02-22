@@ -75,6 +75,13 @@ run_cppcheck() {
     C_FILES="`pick_source_files "$@"`"
     test -n "$C_FILES" || return 1
 
+    for i in "$@"; do
+        if printf "%s\n" "$i" | match '^-E'; then
+            # skip cppcheck when only preprocessing files, it would break ccache
+            return 0
+        fi
+    done
+
     if printf "%s\n" "$C_FILES" | match 'conftest.c'; then
         # avoid unnecessary delays when running autoconf checks
         return 0
