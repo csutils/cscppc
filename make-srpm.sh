@@ -66,6 +66,7 @@ Group:      Development/Tools
 License:    GPLv3+
 URL:        https://engineering.redhat.com/trac/CoverityScan
 Source0:    http://git.engineering.redhat.com/?p=users/kdudka/coverity-scan.git;a=blob_plain;f=cppcheck-gcc/cppcheck-gcc
+Source1:    http://git.engineering.redhat.com/?p=users/kdudka/coverity-scan.git;a=blob_plain;f=cppcheck-gcc/default.supp
 
 BuildRoot:  %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
@@ -87,11 +88,14 @@ rm -rf "\$RPM_BUILD_ROOT"
 rm -rf "\$RPM_BUILD_ROOT"
 
 install -m0755 -d \\
-    "\$RPM_BUILD_ROOT%{_bindir}" \\
-    "\$RPM_BUILD_ROOT%{_libdir}" \\
+    "\$RPM_BUILD_ROOT%{_bindir}"                \\
+    "\$RPM_BUILD_ROOT%{_datadir}"               \\
+    "\$RPM_BUILD_ROOT%{_datadir}/cppcheck-gcc"  \\
+    "\$RPM_BUILD_ROOT%{_libdir}"                \\
     "\$RPM_BUILD_ROOT%{_libdir}/cppcheck-gcc"
 
 install -m0755 %{SOURCE0} "\$RPM_BUILD_ROOT%{_bindir}"
+install -m0644 %{SOURCE1} "\$RPM_BUILD_ROOT%{_datadir}/cppcheck-gcc"
 
 for i in c++ cc g++ gcc \\
     %{_arch}-redhat-linux-c++ \\
@@ -104,6 +108,7 @@ done
 %files
 %defattr(-,root,root,-)
 %{_bindir}/cppcheck-gcc
+%{_datadir}/cppcheck-gcc
 %{_libdir}/cppcheck-gcc
 EOF
 

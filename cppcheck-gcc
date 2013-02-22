@@ -24,6 +24,11 @@ CPPCHECK_TEMPLATE="'{file}:{line}: {severity}: {id}: {message}'"
 CPPCHECK_DEF_ARGS="--template=$CPPCHECK_TEMPLATE --inline-suppr"
 CPPCHECK_DEF_ARGS="$CPPCHECK_DEF_ARGS -I/usr/include $ARCH_DEF"
 
+CPPCHECK_SUPPLIST="/usr/share/cppcheck-gcc/default.supp"
+if test -r "$CPPCHECK_SUPPLIST"; then
+    CPPCHECK_DEF_ARGS="$CPPCHECK_DEF_ARGS --suppressions-list=$CPPCHECK_SUPPLIST"
+fi
+
 test -n "$CPPCHECK"      || CPPCHECK="cppcheck"
 test -n "$CPPCHECK_ARGS" || CPPCHECK_ARGS="$CPPCHECK_DEF_ARGS"
 
