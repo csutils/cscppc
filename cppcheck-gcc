@@ -17,6 +17,9 @@
 # You should have received a copy of the GNU General Public License
 # along with cppcheck-gcc.  If not, see <http://www.gnu.org/licenses/>.
 
+SELF="$0"
+TOOL="`basename "$SELF"`"
+
 # FIXME: this is not going to work well when cross-compiling
 ARCH_DEF="-D__`uname -i`__"
 
@@ -104,8 +107,22 @@ run_cppcheck() {
     eval run_cmd "$CPPCHECK" `pick_defs_and_incs "$@"` ${CPPCHECK_ARGS} $C_FILES
 }
 
-CC="/usr/bin/`basename "$0"`"
-run_cmd "$CC" "$@"
+remove_self_from_path() {
+    PATH="`printf "%s\n" "$PATH" | while read -d: dir
+    do
+        real_name="$(basename "$(readlink -f "$dir/$TOOL")")"
+        if test "$real_name" = "cppcheck-gcc"; then
+            # remove path to itself in order to prevent an infinite loop
+            continue
+        fi
+
+        printf ":%s" "$dir"
+    done`"
+    export PATH
+}
+
+remove_self_from_path
+run_cmd "$TOOL" "$@"
 EC=$?
 
 run_cppcheck "$@"
