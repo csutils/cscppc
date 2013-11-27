@@ -23,6 +23,9 @@ TOOL="`basename "$SELF"`"
 # FIXME: this is not going to work well when cross-compiling
 ARCH_DEF="-D__`uname -i`__"
 
+# pretend GCC
+ARCH_DEF="$ARCH_DEF -D__GNUC__"
+
 CPPCHECK_TEMPLATE="'{file}:{line}: {severity}: {id}: {message}'"
 CPPCHECK_DEF_ARGS="--template=$CPPCHECK_TEMPLATE --inline-suppr"
 CPPCHECK_DEF_ARGS="$CPPCHECK_DEF_ARGS $ARCH_DEF --quiet"
