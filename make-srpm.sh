@@ -73,7 +73,8 @@ BuildRoot:  %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 # the --include option was introduced in 1.58
 Requires: cppcheck >= 1.58
 
-BuildArch:  noarch
+# FIXME
+ExclusiveArch: x86_64
 
 %description
 This package contains the cppcheck-gcc shell script to hook cppcheck on gcc
