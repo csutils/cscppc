@@ -24,7 +24,7 @@ TOOL="`basename "$SELF"`"
 ARCH_DEF="-D__`uname -i`__"
 
 # pretend GCC
-ARCH_DEF="$ARCH_DEF -D__GNUC__"
+ARCH_DEF="$ARCH_DEF -D__GNUC__ -D__STDC__"
 
 # assume x86_64
 ARCH_DEF="$ARCH_DEF -D__WORDSIZE=64"
