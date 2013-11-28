@@ -99,8 +99,13 @@ run_cppcheck() {
         fi
     done
 
-    if printf "%s\n" "$C_FILES" | match 'conftest.c'; then
+    if printf "%s\n" "$C_FILES" | match -F 'conftest.c'; then
         # avoid unnecessary delays when running autoconf checks
+        return 0
+    fi
+
+    if printf "%s\n" "$C_FILES" | match -F '../test.c'; then
+        # avoid unnecessary delays when running waf checks
         return 0
     fi
 
