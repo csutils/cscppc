@@ -109,6 +109,11 @@ run_cppcheck() {
         return 0
     fi
 
+    if printf "%s\n" "$C_FILES" | match -F '_configtest.c'; then
+        # avoid unnecessary delays when running numpy checks
+        return 0
+    fi
+
     if printf "%s\n" "$C_FILES" | match 'CMakeFiles/CMakeTmp/testCXXCompiler.cxx'
     then
         # avoid a panic of CMake when checking basic functionality of CXX
