@@ -114,7 +114,7 @@ run_cppcheck() {
         return 0
     fi
 
-    if printf "%s\n" "$C_FILES" | match 'CMakeFiles/CMakeTmp/testCXXCompiler.cxx'
+    if printf "%s\n" "$C_FILES" | match '/CMakeTmp/'
     then
         # avoid a panic of CMake when checking basic functionality of CXX
         return 0
