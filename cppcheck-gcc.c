@@ -26,9 +26,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 #include <unistd.h>
 
-char wname[] = "cppcheck-gcc";
+static const char wname[] = "cppcheck-gcc";
+
+static pid_t pid_compiler;
 
 /* print error and return EXIT_FAILURE */
 static int fail(const char *fmt, ...)
@@ -92,11 +96,50 @@ bool remove_self_from_path(const char *tool, char *path)
     return found;
 }
 
+pid_t launch_tool(const char *tool, char **argv)
+{
+    const pid_t pid = fork();
+    if (pid != 0)
+        /* either fork() failure, or continuation of the parental process */
+        return pid;
+
+    execvp(tool, argv);
+    exit(EXIT_FAILURE);
+}
+
+int wait_for(pid_t pid)
+{
+    int status;
+    while (-1 == waitpid(pid, &status, 0))
+        if (EINTR != errno)
+            return fail("waitpid(%d) failed: %s", pid, strerror(errno));
+
+    if (WIFEXITED(status))
+        /* propagate the exit status of the child */
+        return WEXITSTATUS(status);
+
+    if (WIFSIGNALED(status))
+        /* child signalled to die */
+        return 0x80 + WTERMSIG(status);
+
+    return fail("waitpid(%d) returned unexpected status: %d", pid, status);
+}
+
 int run_compiler_and_cppcheck(const char *tool, char **argv)
 {
-    /* TODO */
-    execvp(tool, argv);
-    return fail("failed to launch %s (%s)", tool, strerror(errno));
+    pid_compiler = launch_tool(tool, argv);
+    if (pid_compiler <= 0)
+        return fail("failed to launch %s (%s)", tool, strerror(errno));
+
+    /* TODO: consider running cppcheck */
+
+    const int status = wait_for(pid_compiler);
+
+    /* TODO: consider killing cppcheck */
+
+    /* TODO: wait for cppcheck if running */
+
+    return status;
 }
 
 int main(int argc, char *argv[])
