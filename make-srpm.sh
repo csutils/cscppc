@@ -71,6 +71,10 @@ Source2:    http://git.engineering.redhat.com/?p=users/kdudka/coverity-scan.git;
 
 BuildRoot:  %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
+%if (0%{?fedora} >= 12 || 0%{?rhel} >= 6)
+BuildRequires: glibc-static
+%endif
+
 # the --include option was introduced in 1.58
 Requires: cppcheck >= 1.58
 
