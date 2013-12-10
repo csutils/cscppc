@@ -166,12 +166,16 @@ pid_t launch_tool(const char *tool, char **argv)
     exit(EXIT_FAILURE);
 }
 
-int wait_for(pid_t pid)
+int wait_for(volatile pid_t *ppid)
 {
+    const pid_t pid = *ppid;
+
     int status;
     while (-1 == waitpid(pid, &status, 0))
         if (EINTR != errno)
             return fail("waitpid(%d) failed: %s", pid, strerror(errno));
+
+    *ppid = (pid_t) 0;
 
     if (WIFEXITED(status))
         /* propagate the exit status of the child */
@@ -341,18 +345,15 @@ int run_compiler_and_cppcheck(const char *tool, const int argc, char **argv)
 
     consider_running_cppcheck(argc, argv);
 
-    const int status = wait_for(pid_compiler);
-    pid_compiler = 0;
+    const int status = wait_for(&pid_compiler);
 
     if (0 < pid_cppcheck) {
-        /* cppcheck was started, wait till it finishes */
-
         if (status)
             /* compilation failed --> kill cppcheck now! */
             kill(pid_cppcheck, SIGTERM);
 
-        wait_for(pid_cppcheck);
-        pid_cppcheck = 0;
+        /* cppcheck was started, wait till it finishes */
+        wait_for(&pid_cppcheck);
     }
 
     return status;
