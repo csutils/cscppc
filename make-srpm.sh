@@ -65,8 +65,9 @@ Summary:    A GCC wrapper that runs cppcheck.
 Group:      Development/Tools
 License:    GPLv3+
 URL:        https://engineering.redhat.com/trac/CoverityScan
-Source0:    http://git.engineering.redhat.com/?p=users/kdudka/coverity-scan.git;a=blob_plain;f=cppcheck-gcc/cppcheck-gcc
-Source1:    http://git.engineering.redhat.com/?p=users/kdudka/coverity-scan.git;a=blob_plain;f=cppcheck-gcc/default.supp
+Source0:    http://git.engineering.redhat.com/?p=users/kdudka/coverity-scan.git;a=blob_plain;f=cppcheck-gcc/cppcheck-gcc.c
+Source1:    http://git.engineering.redhat.com/?p=users/kdudka/coverity-scan.git;a=blob_plain;f=cppcheck-gcc/Makefile
+Source2:    http://git.engineering.redhat.com/?p=users/kdudka/coverity-scan.git;a=blob_plain;f=cppcheck-gcc/default.supp
 
 BuildRoot:  %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
@@ -77,15 +78,26 @@ Requires: cppcheck >= 1.58
 ExclusiveArch: x86_64
 
 %description
-This package contains the cppcheck-gcc shell script to hook cppcheck on gcc
-during the build fully transparently.
+This package contains the cppcheck-gcc wrapper to hook cppcheck on gcc during
+the build fully transparently.
+
+%prep
+rm -rf %{name}-%{version}
+install -m0755 -d %{name}-%{version}
+cd %{name}-%{version}
+install -m0644 %{SOURCE0} %{SOURCE1} .
 
 %build
+cd %{name}-%{version}
+make %{?_smp_mflags} \
+    CFLAGS="\$RPM_OPT_FLAGS" \
+    LDFLAGS="\$RPM_OPT_FLAGS -static -pthread"
 
 %clean
 rm -rf "\$RPM_BUILD_ROOT"
 
 %install
+cd %{name}-%{version}
 rm -rf "\$RPM_BUILD_ROOT"
 
 install -m0755 -d \\
@@ -95,8 +107,8 @@ install -m0755 -d \\
     "\$RPM_BUILD_ROOT%{_libdir}"                \\
     "\$RPM_BUILD_ROOT%{_libdir}/cppcheck-gcc"
 
-install -m0755 %{SOURCE0} "\$RPM_BUILD_ROOT%{_bindir}"
-install -m0644 %{SOURCE1} "\$RPM_BUILD_ROOT%{_datadir}/cppcheck-gcc"
+install -m0755 %{name} "\$RPM_BUILD_ROOT%{_bindir}"
+install -m0644 %{SOURCE2} "\$RPM_BUILD_ROOT%{_datadir}/cppcheck-gcc"
 
 for i in c++ cc g++ gcc \\
     %{_arch}-redhat-linux-c++ \\
@@ -105,6 +117,9 @@ for i in c++ cc g++ gcc \\
 do
     ln -s ../../bin/cppcheck-gcc "\$RPM_BUILD_ROOT%{_libdir}/cppcheck-gcc/\$i"
 done
+
+# force generating the %{name}-debuginfo package
+%{debug_package}
 
 %files
 %defattr(-,root,root,-)
