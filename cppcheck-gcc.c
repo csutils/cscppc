@@ -320,14 +320,17 @@ void consider_running_cppcheck(const int argc_orig, char **argv)
     /* make sure the cppcheck process is named cppcheck */
     argv[0] = "cppcheck";
 
-#if 0
-    int i;
-    for(i = 0; i < argc_total; ++i)
-        printf("cppcheck-gcc: argv[%d] = %s\n", i, argv[i]);
-#endif
+    const char *var_debug = getenv("DEBUG_CPPCHECK_GCC");
+    if (var_debug && *var_debug) {
+        const pid_t pid = getpid();
+
+        int i;
+        for(i = 0; i < argc_total; ++i)
+            printf("cppcheck-gcc[%d]: argv[%d] = %s\n", pid, i, argv[i]);
+    }
 
     /* try to start cppcheck */
-    pid_cppcheck = launch_tool("cppcheck", /* XXX */ argv);
+    pid_cppcheck = launch_tool("cppcheck", argv);
     if (0 < pid_cppcheck)
         return;
 
