@@ -21,6 +21,7 @@
 
 #include <errno.h>
 #include <libgen.h>
+#include <signal.h>
 #include <stdarg.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -51,8 +52,8 @@ static const size_t cppcheck_def_argc =
     sizeof(cppcheck_def_argv)/
     sizeof(cppcheck_def_argv[0]);
 
-static pid_t pid_compiler;
-static pid_t pid_cppcheck;
+static volatile pid_t pid_compiler;
+static volatile pid_t pid_cppcheck;
 
 /* print error and return EXIT_FAILURE */
 static int fail(const char *fmt, ...)
@@ -114,6 +115,44 @@ bool remove_self_from_path(const char *tool, char *path)
     }
 
     return found;
+}
+
+void signal_forwarder(int signum)
+{
+    const int saved_errno = errno;
+
+    if (pid_compiler)
+        kill(pid_compiler, signum);
+
+    if (pid_cppcheck)
+        kill(pid_cppcheck, signum);
+
+    errno = saved_errno;
+}
+
+bool install_signal_forwarder(void)
+{
+    static int forwarded_signals[] = {
+        SIGINT,
+        SIGQUIT,
+        SIGTERM
+    };
+
+    static int forwarded_signals_cnt =
+        sizeof(forwarded_signals)/
+        sizeof(forwarded_signals[0]);
+
+    static const struct sigaction sa = {
+        .sa_handler = signal_forwarder
+    };
+
+    /* install the handler for all forwarded signals */
+    int i;
+    for (i = 0; i < forwarded_signals_cnt; ++i)
+        if (0 != sigaction(forwarded_signals[i], &sa, NULL))
+            return false;
+
+    return true;
 }
 
 pid_t launch_tool(const char *tool, char **argv)
@@ -293,6 +332,9 @@ void consider_running_cppcheck(const int argc_orig, char **argv)
 
 int run_compiler_and_cppcheck(const char *tool, const int argc, char **argv)
 {
+    if (!install_signal_forwarder())
+        return fail("unable to install signal forwarder");
+
     pid_compiler = launch_tool(tool, argv);
     if (pid_compiler <= 0)
         return fail("failed to launch %s (%s)", tool, strerror(errno));
@@ -300,6 +342,7 @@ int run_compiler_and_cppcheck(const char *tool, const int argc, char **argv)
     consider_running_cppcheck(argc, argv);
 
     const int status = wait_for(pid_compiler);
+    pid_compiler = 0;
 
     if (0 < pid_cppcheck) {
         /* cppcheck was started, wait till it finishes */
@@ -309,6 +352,7 @@ int run_compiler_and_cppcheck(const char *tool, const int argc, char **argv)
             kill(pid_cppcheck, SIGTERM);
 
         wait_for(pid_cppcheck);
+        pid_cppcheck = 0;
     }
 
     return status;
