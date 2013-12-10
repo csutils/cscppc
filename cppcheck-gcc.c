@@ -30,7 +30,26 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
+#define STREQ(a, b) (!strcmp(a, b))
+#define MATCH_PREFIX(str, pref) (!strncmp(str, pref, sizeof(pref) - 1U))
+
 static const char wname[] = "cppcheck-gcc";
+
+static const char *cppcheck_def_argv[] = {
+    "-D__x86_64",
+    "-D__GNUC__",
+    "-D__STDC__",
+    "-D__WORDSIZE=64",
+    "--inline-suppr",
+    "--quiet",
+    "--template={file}:{line}: {severity}: {id}: {message}",
+    "--suppressions-list=/usr/share/cppcheck-gcc/default.supp",
+    NULL
+};
+
+static const size_t cppcheck_def_argc =
+    sizeof(cppcheck_def_argv)/
+    sizeof(cppcheck_def_argv[0]);
 
 static pid_t pid_compiler;
 static pid_t pid_cppcheck;
@@ -126,15 +145,145 @@ int wait_for(pid_t pid)
     return fail("waitpid(%d) returned unexpected status: %d", pid, status);
 }
 
-void consider_running_cppcheck(const int argc, char **argv)
+bool is_def_inc(const char *arg)
 {
-    /* TODO: collect source file names */
-    (void) argc;
+    return MATCH_PREFIX(arg, "-D")
+        || MATCH_PREFIX(arg, "-I");
+}
 
-    /* TODO: check for black-listed source files */
+bool is_input_file_suffix(const char *suffix)
+{
+    return STREQ(suffix, "c")
+        || STREQ(suffix, "C")
+        || STREQ(suffix, "cc")
+        || STREQ(suffix, "cpp")
+        || STREQ(suffix, "cxx");
+}
 
-    /* TODO: build the command-line for cppcheck */
+bool is_black_listed_file(const char *name)
+{
+    return STREQ(name, "conftest.c")
+        || STREQ(name, "../test.c")
+        || STREQ(name, "_configtest.c")
+        || strstr(name, "/CMakeTmp/");
+}
 
+bool is_input_file(const char *arg, bool *black_listed)
+{
+    const char *suffix = strrchr(arg, '.');
+    if (!suffix)
+        /* we require the file name to contain at least one dot */
+        return false;
+
+    /* skip behind the dot */
+    ++suffix;
+    if (!is_input_file_suffix(suffix))
+        /* not a know input file suffix */
+        return false;
+
+    *black_listed = is_black_listed_file(arg);
+    return true;
+}
+
+int drop_arg(int *pargc, char **argv, const int i)
+{
+    const int argc = --(*pargc);
+    char **start = argv + i;
+    memmove(start, start + 1, argc * sizeof(*argv));
+    return argc;
+}
+
+int translate_args_for_cppcheck(int argc, char **argv)
+{
+    int cnt_files = 0;
+
+    int i;
+    for (i = 1; i < argc; ++i) {
+        const char *arg = argv[i];
+        if (STREQ(arg, "-E"))
+            /* preprocessing --> bypass cppcheck in order to not break ccache */
+            return -1;
+
+        if (is_def_inc(arg))
+            /* pass -D and -I flags directly */
+            continue;
+
+        bool black_listed = false;
+        if (is_input_file(arg, &black_listed)) {
+            if (black_listed)
+                /* black-listed input file --> do not start cppcheck */
+                return -1;
+
+            /* pass input file name as it is */
+            ++cnt_files;
+            continue;
+        }
+
+        /* translate -iquote and -isystem to -I... */
+        if ((STREQ(arg, "-iquote") || STREQ(arg, "-isystem"))
+                && (0 < drop_arg(&argc, argv, i)))
+        {
+            char *cpp_arg;
+            if (0 < asprintf(&cpp_arg, "-I%s", argv[i]))
+                argv[i] = cpp_arg;
+
+            continue;
+        }
+
+        /* translate '-include FILE' to --include=FILE */
+        if (STREQ(arg, "-include") && (0 < drop_arg(&argc, argv, i))) {
+            char *cpp_arg;
+            if (0 < asprintf(&cpp_arg, "--include=%s", argv[i]))
+                argv[i] = cpp_arg;
+
+            continue;
+        }
+
+        /* drop anything else */
+        drop_arg(&argc, argv, i--);
+    }
+
+    if (!cnt_files)
+        /* no input files, giving up... */
+        return -1;
+
+    return argc;
+}
+
+void consider_running_cppcheck(const int argc_orig, char **argv)
+{
+    /* translate cmd-line args for cppcheck */
+    const int argc_cmd = translate_args_for_cppcheck(argc_orig, argv);
+    if (argc_cmd <= 0)
+        /* do not start cppcheck */
+        return;
+
+    const int argc_total = argc_cmd + cppcheck_def_argc;
+    if (argc_orig < argc_total) {
+        /* allocate argv on heap */
+        const size_t argv_size = sizeof(char *) * argc_total;
+        char **argv_dup = malloc(argv_size);
+        if (!argv_dup)
+            /* OOM */
+            return;
+
+        memcpy(argv_dup, argv, argv_size);
+        argv = argv_dup;
+    }
+
+    /* append default cppcheck args */
+    memcpy(argv + argc_cmd, cppcheck_def_argv, sizeof cppcheck_def_argv);
+
+    /* make sure the cppcheck process is named cppcheck */
+    argv[0] = "cppcheck";
+
+#if 0
+    int i;
+    for(i = 0; i < argc_total; ++i)
+        printf("cppcheck-gcc: argv[%d] = %s\n", i, argv[i]);
+#endif
+
+    /* try to start cppcheck */
     pid_cppcheck = launch_tool("cppcheck", /* XXX */ argv);
     if (0 < pid_cppcheck)
         return;
