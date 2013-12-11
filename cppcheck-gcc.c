@@ -294,9 +294,10 @@ int translate_args_for_cppcheck(int argc, char **argv)
     return argc;
 }
 
-void consider_running_cppcheck(const int argc_orig, char **argv)
+void consider_running_cppcheck(const int argc_orig, char **const argv_orig)
 {
     /* translate cmd-line args for cppcheck */
+    char **argv = argv_orig;
     const int argc_cmd = translate_args_for_cppcheck(argc_orig, argv);
     if (argc_cmd <= 0)
         /* do not start cppcheck */
@@ -332,10 +333,12 @@ void consider_running_cppcheck(const int argc_orig, char **argv)
 
     /* try to start cppcheck */
     pid_cppcheck = launch_tool("cppcheck", argv);
-    if (0 < pid_cppcheck)
-        return;
+    if (pid_cppcheck <= 0)
+        fail("failed to launch cppcheck (%s)", strerror(errno));
 
-    fail("failed to launch cppcheck (%s)", strerror(errno));
+    if (argv_orig != argv)
+        /* FIXME: release also the memory allocated by asprintf() */
+        free(argv);
 }
 
 int run_compiler_and_cppcheck(const char *tool, const int argc, char **argv)
