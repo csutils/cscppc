@@ -231,9 +231,10 @@ bool is_input_file(const char *arg, bool *black_listed)
 int /* args remain */ drop_arg(int *pargc, char **argv, const int i)
 {
     const int argc = --(*pargc);
+    const int args_remain = argc - i;
     char **start = argv + i;
-    memmove(start, start + 1, argc * sizeof(*argv));
-    return argc - i;
+    memmove(start, start + 1, args_remain * sizeof(*argv));
+    return args_remain;
 }
 
 int translate_args_for_cppcheck(int argc, char **argv)
