@@ -163,7 +163,9 @@ pid_t launch_tool(const char *tool, char **argv)
         return pid;
 
     execvp(tool, argv);
-    exit(EXIT_FAILURE);
+    exit((ENOENT == errno)
+            ? /* command not found      */ 0x7F
+            : /* command not executable */ 0x7E);
 }
 
 int wait_for(volatile pid_t *ppid)
