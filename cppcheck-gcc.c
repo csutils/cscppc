@@ -196,6 +196,12 @@ bool is_def_inc(const char *arg)
         || MATCH_PREFIX(arg, "-I");
 }
 
+bool is_bare_def_inc(const char *arg)
+{
+    return STREQ(arg, "-D")
+        || STREQ(arg, "-I");
+}
+
 bool is_input_file_suffix(const char *suffix)
 {
     return STREQ(suffix, "c")
@@ -250,9 +256,16 @@ int translate_args_for_cppcheck(int argc, char **argv)
             /* preprocessing --> bypass cppcheck in order to not break ccache */
             return -1;
 
-        if (is_def_inc(arg))
+        if (is_def_inc(arg)) {
+            if (is_bare_def_inc(arg))
+                /* bare -D or -I --> we need to take the next arg, too */
+                if (argc <= ++i)
+                    /* ... but there is not next arg --> bail out now! */
+                    break;
+
             /* pass -D and -I flags directly */
             continue;
+        }
 
         bool black_listed = false;
         if (is_input_file(arg, &black_listed)) {
