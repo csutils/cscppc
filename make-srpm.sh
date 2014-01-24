@@ -2,24 +2,24 @@
 
 # Copyright (C) 2012-2013 Red Hat, Inc.
 #
-# This file is part of cppcheck-gcc.
+# This file is part of cscppc.
 #
-# cppcheck-gcc is free software: you can redistribute it and/or modify
+# cscppc is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # any later version.
 #
-# cppcheck-gcc is distributed in the hope that it will be useful,
+# cscppc is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with cppcheck-gcc.  If not, see <http://www.gnu.org/licenses/>.
+# along with cscppc.  If not, see <http://www.gnu.org/licenses/>.
 
 SELF="$0"
 
-PKG="cppcheck-gcc"
+PKG="cscppc"
 
 die(){
     echo "$SELF: error: $1" >&2
@@ -65,11 +65,13 @@ Summary:    A GCC wrapper that runs cppcheck.
 Group:      Development/Tools
 License:    GPLv3+
 URL:        https://engineering.redhat.com/trac/CoverityScan
-Source0:    http://git.engineering.redhat.com/?p=users/kdudka/coverity-scan.git;a=blob_plain;f=cppcheck-gcc/cppcheck-gcc.c
-Source1:    http://git.engineering.redhat.com/?p=users/kdudka/coverity-scan.git;a=blob_plain;f=cppcheck-gcc/Makefile
-Source2:    http://git.engineering.redhat.com/?p=users/kdudka/coverity-scan.git;a=blob_plain;f=cppcheck-gcc/default.supp
+Source0:    http://git.engineering.redhat.com/?p=users/kdudka/coverity-scan.git;a=blob_plain;f=cscppc/cscppc.c
+Source1:    http://git.engineering.redhat.com/?p=users/kdudka/coverity-scan.git;a=blob_plain;f=cscppc/Makefile
+Source2:    http://git.engineering.redhat.com/?p=users/kdudka/coverity-scan.git;a=blob_plain;f=cscppc/default.supp
 
 BuildRoot:  %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+
+Obsoletes:  cppcheck-gcc
 
 %if (0%{?fedora} >= 12 || 0%{?rhel} >= 6)
 BuildRequires: glibc-static
@@ -82,7 +84,7 @@ Requires: cppcheck >= 1.58
 ExclusiveArch: x86_64
 
 %description
-This package contains the cppcheck-gcc wrapper to hook cppcheck on gcc during
+This package contains the cscppc wrapper to hook cppcheck on gcc during
 the build fully transparently.
 
 %prep
@@ -107,19 +109,19 @@ rm -rf "\$RPM_BUILD_ROOT"
 install -m0755 -d \\
     "\$RPM_BUILD_ROOT%{_bindir}"                \\
     "\$RPM_BUILD_ROOT%{_datadir}"               \\
-    "\$RPM_BUILD_ROOT%{_datadir}/cppcheck-gcc"  \\
+    "\$RPM_BUILD_ROOT%{_datadir}/cscppc"        \\
     "\$RPM_BUILD_ROOT%{_libdir}"                \\
-    "\$RPM_BUILD_ROOT%{_libdir}/cppcheck-gcc"
+    "\$RPM_BUILD_ROOT%{_libdir}/cscppc"
 
 install -m0755 %{name} "\$RPM_BUILD_ROOT%{_bindir}"
-install -m0644 %{SOURCE2} "\$RPM_BUILD_ROOT%{_datadir}/cppcheck-gcc"
+install -m0644 %{SOURCE2} "\$RPM_BUILD_ROOT%{_datadir}/cscppc"
 
 for i in c++ cc g++ gcc \\
     %{_arch}-redhat-linux-c++ \\
     %{_arch}-redhat-linux-g++ \\
     %{_arch}-redhat-linux-gcc
 do
-    ln -s ../../bin/cppcheck-gcc "\$RPM_BUILD_ROOT%{_libdir}/cppcheck-gcc/\$i"
+    ln -s ../../bin/cscppc "\$RPM_BUILD_ROOT%{_libdir}/cscppc/\$i"
 done
 
 # force generating the %{name}-debuginfo package
@@ -127,9 +129,9 @@ done
 
 %files
 %defattr(-,root,root,-)
-%{_bindir}/cppcheck-gcc
-%{_datadir}/cppcheck-gcc
-%{_libdir}/cppcheck-gcc
+%{_bindir}/cscppc
+%{_datadir}/cscppc
+%{_libdir}/cscppc
 EOF
 
 rpmbuild -bs "$SPEC"                            \

@@ -1,20 +1,20 @@
 /*
  * Copyright (C) 2013 Red Hat, Inc.
  *
- * This file is part of cppcheck-gcc.
+ * This file is part of cscppc.
  *
- * cppcheck-gcc is free software: you can redistribute it and/or modify
+ * cscppc is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * any later version.
  *
- * cppcheck-gcc is distributed in the hope that it will be useful,
+ * cscppc is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with cppcheck-gcc.  If not, see <http://www.gnu.org/licenses/>.
+ * along with cscppc.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #define _GNU_SOURCE 
@@ -34,7 +34,7 @@
 #define STREQ(a, b) (!strcmp(a, b))
 #define MATCH_PREFIX(str, pref) (!strncmp(str, pref, sizeof(pref) - 1U))
 
-static const char wname[] = "cppcheck-gcc";
+static const char wname[] = "cscppc";
 
 static const char *cppcheck_def_argv[] = {
     "-D__x86_64",
@@ -44,7 +44,7 @@ static const char *cppcheck_def_argv[] = {
     "--inline-suppr",
     "--quiet",
     "--template={file}:{line}: {severity}: {id}: {message}",
-    "--suppressions-list=/usr/share/cppcheck-gcc/default.supp",
+    "--suppressions-list=/usr/share/cscppc/default.supp",
     NULL
 };
 
@@ -343,7 +343,7 @@ void consider_running_cppcheck(const int argc_orig, char **const argv_orig)
 
         int i;
         for(i = 0; i < argc_total; ++i)
-            printf("cppcheck-gcc[%d]: argv[%d] = %s\n", pid, i, argv[i]);
+            printf("cscppc[%d]: argv[%d] = %s\n", pid, i, argv[i]);
     }
 
     /* try to start cppcheck */
