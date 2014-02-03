@@ -50,7 +50,6 @@ VER="0.`git log --pretty="%cd_%h" --date=short -1 . | tr -d -`" \
     || die "git log failed"
 
 NV="${PKG}-$VER"
-SRC="${PKG}.tar.xz"
 
 TMP="`mktemp -d`"
 trap "echo --- $SELF: removing $TMP... 2>&1; rm -rf '$TMP'" EXIT
@@ -60,14 +59,15 @@ cat > "$SPEC" << EOF
 Name:       $PKG
 Version:    $VER
 Release:    1%{?dist}
-Summary:    A GCC wrapper that runs cppcheck.
+Summary:    A compiler wrapper that runs cppcheck in background.
 
 Group:      Development/Tools
 License:    GPLv3+
-URL:        https://engineering.redhat.com/trac/CoverityScan
-Source0:    http://git.engineering.redhat.com/?p=users/kdudka/coverity-scan.git;a=blob_plain;f=cscppc/cscppc.c
-Source1:    http://git.engineering.redhat.com/?p=users/kdudka/coverity-scan.git;a=blob_plain;f=cscppc/Makefile
-Source2:    http://git.engineering.redhat.com/?p=users/kdudka/coverity-scan.git;a=blob_plain;f=cscppc/default.supp
+URL:        http://git.fedorahosted.org/cgit/cscppc.git
+Source0:    http://git.fedorahosted.org/cgit/cscppc.git/plain/cscppc.c
+Source1:    http://git.fedorahosted.org/cgit/cscppc.git/plain/COPYING
+Source2:    http://git.fedorahosted.org/cgit/cscppc.git/plain/Makefile
+Source3:    http://git.fedorahosted.org/cgit/cscppc.git/plain/default.supp
 
 BuildRoot:  %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
@@ -84,14 +84,14 @@ Requires: cppcheck >= 1.58
 ExclusiveArch: x86_64
 
 %description
-This package contains the cscppc wrapper to hook cppcheck on gcc during
-the build fully transparently.
+This package contains the cscppc compiler wrapper that runs cppcheck in
+background fully transparently.
 
 %prep
 rm -rf %{name}-%{version}
 install -m0755 -d %{name}-%{version}
 cd %{name}-%{version}
-install -m0644 %{SOURCE0} %{SOURCE1} .
+install -m0644 %{SOURCE0} %{SOURCE1} %{SOURCE2} .
 
 %build
 cd %{name}-%{version}
@@ -114,7 +114,7 @@ install -m0755 -d \\
     "\$RPM_BUILD_ROOT%{_libdir}/cscppc"
 
 install -m0755 %{name} "\$RPM_BUILD_ROOT%{_bindir}"
-install -m0644 %{SOURCE2} "\$RPM_BUILD_ROOT%{_datadir}/cscppc"
+install -m0644 %{SOURCE3} "\$RPM_BUILD_ROOT%{_datadir}/cscppc"
 
 for i in c++ cc g++ gcc \\
     %{_arch}-redhat-linux-c++ \\
@@ -132,6 +132,7 @@ done
 %{_bindir}/cscppc
 %{_datadir}/cscppc
 %{_libdir}/cscppc
+%doc %{name}-%{version}/COPYING
 EOF
 
 rpmbuild -bs "$SPEC"                            \
