@@ -54,6 +54,14 @@ NV="${PKG}-$VER"
 TMP="`mktemp -d`"
 trap "echo --- $SELF: removing $TMP... 2>&1; rm -rf '$TMP'" EXIT
 test -d "$TMP" || die "mktemp failed"
+
+SRC_TAR="${NV}.tar"
+SRC="${SRC_TAR}.xz"
+git archive --prefix="$NV/" --format="tar" HEAD -- . > "${TMP}/${SRC_TAR}" \
+                                        || die "failed to export sources"
+cd "$TMP" >/dev/null                    || die "mktemp failed"
+xz -c "$SRC_TAR" > "$SRC"               || die "failed to compress sources"
+
 SPEC="$TMP/$PKG.spec"
 cat > "$SPEC" << EOF
 Name:       $PKG
@@ -64,11 +72,7 @@ Summary:    A compiler wrapper that runs cppcheck in background.
 Group:      Development/Tools
 License:    GPLv3+
 URL:        http://git.fedorahosted.org/cgit/cscppc.git
-Source0:    http://git.fedorahosted.org/cgit/cscppc.git/plain/cscppc.c
-Source1:    http://git.fedorahosted.org/cgit/cscppc.git/plain/COPYING
-Source2:    http://git.fedorahosted.org/cgit/cscppc.git/plain/Makefile
-Source3:    http://git.fedorahosted.org/cgit/cscppc.git/plain/default.supp
-
+Source0:    http://git.fedorahosted.org/cgit/cscppc.git/snapshot/$SRC
 BuildRoot:  %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 Obsoletes:  cppcheck-gcc
@@ -88,13 +92,9 @@ This package contains the cscppc compiler wrapper that runs cppcheck in
 background fully transparently.
 
 %prep
-rm -rf %{name}-%{version}
-install -m0755 -d %{name}-%{version}
-cd %{name}-%{version}
-install -m0644 %{SOURCE0} %{SOURCE1} %{SOURCE2} .
+%setup -q
 
 %build
-cd %{name}-%{version}
 make %{?_smp_mflags} \
     CFLAGS="\$RPM_OPT_FLAGS" \
     LDFLAGS="\$RPM_OPT_FLAGS -static -pthread"
@@ -103,7 +103,6 @@ make %{?_smp_mflags} \
 rm -rf "\$RPM_BUILD_ROOT"
 
 %install
-cd %{name}-%{version}
 rm -rf "\$RPM_BUILD_ROOT"
 
 install -m0755 -d \\
@@ -114,7 +113,7 @@ install -m0755 -d \\
     "\$RPM_BUILD_ROOT%{_libdir}/cscppc"
 
 install -m0755 %{name} "\$RPM_BUILD_ROOT%{_bindir}"
-install -m0644 %{SOURCE3} "\$RPM_BUILD_ROOT%{_datadir}/cscppc"
+install -m0644 default.supp "\$RPM_BUILD_ROOT%{_datadir}/cscppc"
 
 for i in c++ cc g++ gcc \\
     %{_arch}-redhat-linux-c++ \\
@@ -124,20 +123,17 @@ do
     ln -s ../../bin/cscppc "\$RPM_BUILD_ROOT%{_libdir}/cscppc/\$i"
 done
 
-# force generating the %{name}-debuginfo package
-%{debug_package}
-
 %files
 %defattr(-,root,root,-)
 %{_bindir}/cscppc
 %{_datadir}/cscppc
 %{_libdir}/cscppc
-%doc %{name}-%{version}/COPYING
+%doc COPYING
 EOF
 
 rpmbuild -bs "$SPEC"                            \
-    --define "_sourcedir ."                     \
-    --define "_specdir ."                       \
+    --define "_sourcedir $TMP"                  \
+    --define "_specdir $TMP"                    \
     --define "_srcrpmdir $DST"                  \
     --define "_source_filedigest_algorithm md5" \
     --define "_binary_filedigest_algorithm md5"
