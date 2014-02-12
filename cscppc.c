@@ -19,6 +19,7 @@
 
 #define _GNU_SOURCE 
 
+#include <bits/wordsize.h>
 #include <errno.h>
 #include <libgen.h>
 #include <signal.h>
@@ -37,10 +38,17 @@
 static const char wname[] = "cscppc";
 
 static const char *cppcheck_def_argv[] = {
-    "-D__x86_64",
     "-D__GNUC__",
     "-D__STDC__",
+#if __WORDSIZE == 32
+    "-D__i386__",
+    "-D__WORDSIZE=32",
+#elif __WORDSIZE == 64
+    "-D__x86_64__",
     "-D__WORDSIZE=64",
+#else
+#error "Unknown word size"
+#endif
     "--inline-suppr",
     "--quiet",
     "--template={file}:{line}: {severity}: {id}: {message}",

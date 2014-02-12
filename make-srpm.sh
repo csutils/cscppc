@@ -74,7 +74,7 @@ cat > "$SPEC" << EOF
 Name:       $PKG
 Version:    $VER
 Release:    1%{?dist}
-Summary:    A compiler wrapper that runs cppcheck in background.
+Summary:    A compiler wrapper that runs cppcheck in background
 
 Group:      Development/Tools
 License:    GPLv3+
@@ -91,9 +91,6 @@ BuildRequires: glibc-static
 # the --include option was introduced in 1.58
 Requires: cppcheck >= 1.58
 
-# FIXME
-ExclusiveArch: x86_64
-
 %description
 This package contains the cscppc compiler wrapper that runs cppcheck in
 background fully transparently.
@@ -102,8 +99,8 @@ background fully transparently.
 %setup -q
 
 %build
-make %{?_smp_mflags} \
-    CFLAGS="\$RPM_OPT_FLAGS" \
+make %{?_smp_mflags}                            \\
+    CFLAGS="\$RPM_OPT_FLAGS"                    \\
     LDFLAGS="\$RPM_OPT_FLAGS -static -pthread"
 
 %clean
