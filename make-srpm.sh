@@ -132,7 +132,7 @@ done
 %{_bindir}/cscppc
 %{_datadir}/cscppc
 %{_libdir}/cscppc
-%doc COPYING
+%doc COPYING README
 EOF
 
 rpmbuild -bs "$SPEC"                            \
