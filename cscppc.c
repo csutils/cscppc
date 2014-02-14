@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 Red Hat, Inc.
+ * Copyright (C) 2013-2014 Red Hat, Inc.
  *
  * This file is part of cscppc.
  *
@@ -74,6 +74,23 @@ static int fail(const char *fmt, ...)
     fputc('\n', stderr);
 
     va_end(ap);
+    return EXIT_FAILURE;
+}
+
+static int usage(char *argv[])
+{
+    fprintf(stderr, "Usage:\n\
+    %s is a compiler wrapper that runs cppcheck in background.  Create a\n\
+    symbolic link to %s named as your compiler (gcc, g++, ...) and put it\n\
+    to your $PATH.  %s --help prints this text to standard error output.\n",
+    wname, wname, wname);
+
+    for (; *argv; ++argv)
+        if (STREQ("--help", *argv))
+            /* if the user really asks for --help, we have succeeded */
+            return EXIT_SUCCESS;
+
+    /* wrapper called directly, no argument matched */
     return EXIT_FAILURE;
 }
 
@@ -396,7 +413,12 @@ int main(int argc, char *argv[])
         return fail("argc < 1");
 
     /* check which tool we are asked to run via this wrapper */
-    char *tool = strdup(basename(argv[0]));
+    char *tool = basename(argv[0]);
+    if (STREQ(tool, wname))
+        return usage(argv);
+
+    /* duplicate the string as basename() return value is not valid forever */
+    tool = strdup(tool);
     if (!tool)
         return fail("strdup() failed");
 
