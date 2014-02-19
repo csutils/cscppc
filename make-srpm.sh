@@ -48,12 +48,7 @@ VER="`echo "$VER" | sed "s/-.*-/.$TIMESTAMP./"`"
 BRANCH="`git rev-parse --abbrev-ref HEAD`"
 test -n "$BRANCH" || die "failed to get current branch name"
 test master = "${BRANCH}" || VER="${VER}.${BRANCH}"
-
-TBRANCH="`git rev-parse --abbrev-ref --symbolic-full-name @{u}`"
-if test -z "$TBRANCH" || test @ == "${TBRANCH:0:1}"; then
-    die "failed to get tracking branch name"
-fi
-test -z "`git diff $TBRANCH`" || VER="${VER}.dirty"
+test -z "`git diff HEAD`" || VER="${VER}.dirty"
 
 NV="${PKG}-${VER}"
 printf "%s: preparing a release of \033[1;32m%s\033[0m\n" "$SELF" "$NV"
@@ -84,6 +79,10 @@ BuildRoot:  %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 Obsoletes:  cppcheck-gcc
 
+# csmock copies the resulting cscppc binary into mock chroot, which may contain
+# an older (e.g. RHEL-5) version of glibc, and it would not dynamically link
+# against the old version of glibc if it was built against a newer one.
+# Therefor we link glibc statically.
 %if (0%{?fedora} >= 12 || 0%{?rhel} >= 6)
 BuildRequires: glibc-static
 %endif
