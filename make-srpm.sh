@@ -79,6 +79,8 @@ BuildRoot:  %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 Obsoletes:  cppcheck-gcc
 
+BuildRequires: asciidoc
+
 # csmock copies the resulting cscppc binary into mock chroot, which may contain
 # an older (e.g. RHEL-5) version of glibc, and it would not dynamically link
 # against the old version of glibc if it was built against a newer one.
@@ -113,10 +115,12 @@ install -m0755 -d \\
     "\$RPM_BUILD_ROOT%{_datadir}"               \\
     "\$RPM_BUILD_ROOT%{_datadir}/cscppc"        \\
     "\$RPM_BUILD_ROOT%{_libdir}"                \\
-    "\$RPM_BUILD_ROOT%{_libdir}/cscppc"
+    "\$RPM_BUILD_ROOT%{_libdir}/cscppc"         \\
+    "\$RPM_BUILD_ROOT%{_mandir}/man1"
 
-install -m0755 %{name} "\$RPM_BUILD_ROOT%{_bindir}"
-install -m0644 default.supp "\$RPM_BUILD_ROOT%{_datadir}/cscppc"
+install -p -m0755 %{name} "\$RPM_BUILD_ROOT%{_bindir}"
+install -p -m0644 %{name}.1 "\$RPM_BUILD_ROOT%{_mandir}/man1"
+install -p -m0644 default.supp "\$RPM_BUILD_ROOT%{_datadir}/cscppc"
 
 for i in c++ cc g++ gcc \\
     %{_arch}-redhat-linux-c++ \\
@@ -131,6 +135,7 @@ done
 %{_bindir}/cscppc
 %{_datadir}/cscppc
 %{_libdir}/cscppc
+%{_mandir}/man1/%{name}.1*
 %doc COPYING README
 EOF
 

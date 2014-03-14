@@ -1,0 +1,108 @@
+cscppc(1)
+=========
+:doctype: manpage
+
+NAME
+----
+cscppc - a compiler wrapper that runs cppcheck in background
+
+
+SYNOPSIS
+--------
+*cscppc* ['--help']
+
+
+DESCRIPTION
+-----------
+cscppc is a compiler wrapper that runs cppcheck in background.  Create a
+symbolic link to cscppc named as your compiler (gcc, g++, ...) and put it
+to your $PATH.
+
+The following parameters are given to cppcheck by default:
+
+    * -D\__GNUC__
+
+    * -D\__STDC__
+
+    * -D\__i386__ {nbsp}{nbsp}{nbsp}{nbsp}{nbsp}    [32bit architecture only]
+
+    * -D__WORDSIZE=32{nbsp}                         [32bit architecture only]
+
+    * -D\__x86_64__ {nbsp}{nbsp}{nbsp}              [64bit architecture only]
+
+    * -D__WORDSIZE=64{nbsp}                         [64bit architecture only]
+
+    * --inline-suppr
+
+    * --quiet
+
+    * --template="\{file}:\{line}: \{severity}: \{id}: \{message}"
+
+    * --suppressions-list=/usr/share/cscppc/default.supp
+
+The following parameters are passed to cppcheck from compiler's command line:
+
+    * -D...
+
+    * -I...
+
+The following file extensions are recognized as C/C++ source files:
+
+    * c
+
+    * C
+
+    * cc
+
+    * cpp
+
+    * cxx
+
+The following path substrings are black-listed from being scanned by cppcheck:
+
+    * conftest.c
+
+    * _configtest.c
+
+    * /CMakeTmp/
+
+    * ../test.c
+
+
+OPTIONS
+-------
+*--help*::
+    Prints basic usage information.
+
+
+EXIT STATUS
+-----------
+cscppc propagates the exit status returned by the compiler (in case cscppc
+succeeds to run the compiler).  The exit status returned by cppcheck does not
+affect the resulting exit status.
+
+
+ENVIRONMENT VARIABLES
+---------------------
+*DEBUG_CPPCHECK_GCC*::
+    If set to a non-empty string, cscppc outputs the list of parameters given
+    to cppcheck to the standard output.
+
+
+BUGS
+----
+Please report bugs and feature requests to the following mailing-list:
+
+    https://fedorahosted.org/mailman/listinfo/cscppc-devel
+
+
+AUTHOR
+------
+Written by Kamil Dudka.
+
+
+COPYING
+-------
+Copyright \(C) 2013-2014 Red Hat, Inc. Free use of this software is granted
+under the terms of the GNU General Public License (GPL).  See the COPYING file
+for details.
