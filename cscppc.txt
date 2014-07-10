@@ -9,7 +9,7 @@ cscppc - a compiler wrapper that runs cppcheck in background
 
 SYNOPSIS
 --------
-*cscppc* ['--help']
+*cscppc* ['--help' | '--print-path-to-wrap']
 
 
 DESCRIPTION
@@ -68,11 +68,19 @@ The following path substrings are black-listed from being scanned by cppcheck:
 
     * ../test.c
 
+If cscppc is installed on system, the following command activates the wrapper:
+-------------------------------------------------
+export PATH="`cscppc --print-path-to-wrap`:$PATH"
+-------------------------------------------------
+
 
 OPTIONS
 -------
 *--help*::
     Prints basic usage information.
+
+*--print-path-to-wrap*::
+    Prints path to the directory with symlinks to the cscppc executable.
 
 
 EXIT STATUS

@@ -100,8 +100,8 @@ background fully transparently.
 %setup -q
 
 %build
-make %{?_smp_mflags}                            \\
-    CFLAGS="\$RPM_OPT_FLAGS"                    \\
+make %{?_smp_mflags} \\
+    CFLAGS="\$RPM_OPT_FLAGS -DPATH_TO_WRAP='\\"%{_libdir}/cscppc\\"'" \\
     LDFLAGS="\$RPM_OPT_FLAGS -static -pthread"
 
 %clean

@@ -35,6 +35,12 @@
 #define STREQ(a, b) (!strcmp(a, b))
 #define MATCH_PREFIX(str, pref) (!strncmp(str, pref, sizeof(pref) - 1U))
 
+#ifdef PATH_TO_WRAP
+const char *path_to_wrap = PATH_TO_WRAP;
+#else
+const char *path_to_wrap = "";
+#endif
+
 static const char wname[] = "cscppc";
 
 static const char *cppcheck_def_argv[] = {
@@ -80,10 +86,11 @@ static int fail(const char *fmt, ...)
 static int usage(char *argv[])
 {
     fprintf(stderr, "Usage:\n\
+    export PATH=\"`%s --print-path-to-wrap`:$PATH\"\n\n\
     %s is a compiler wrapper that runs cppcheck in background.  Create a\n\
     symbolic link to %s named as your compiler (gcc, g++, ...) and put it\n\
     to your $PATH.  %s --help prints this text to standard error output.\n",
-    wname, wname, wname);
+    wname, wname, wname, wname);
 
     for (; *argv; ++argv)
         if (STREQ("--help", *argv))
@@ -92,6 +99,16 @@ static int usage(char *argv[])
 
     /* wrapper called directly, no argument matched */
     return EXIT_FAILURE;
+}
+
+static int handle_args(const int argc, char *argv[])
+{
+    if (argc == 2 && STREQ("--print-path-to-wrap", argv[1])) {
+        printf("%s\n", path_to_wrap);
+        return EXIT_SUCCESS;
+    }
+
+    return usage(argv);
 }
 
 bool remove_self_from_path(const char *tool, char *path)
@@ -415,7 +432,7 @@ int main(int argc, char *argv[])
     /* check which tool we are asked to run via this wrapper */
     char *tool = basename(argv[0]);
     if (STREQ(tool, wname))
-        return usage(argv);
+        return handle_args(argc, argv);
 
     /* duplicate the string as basename() return value is not valid forever */
     tool = strdup(tool);
