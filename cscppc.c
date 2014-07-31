@@ -353,8 +353,15 @@ int translate_args_for_cppcheck(int argc, char **argv)
 
 void consider_running_cppcheck(const int argc_orig, char **const argv_orig)
 {
+    /* clone the argv array */
+    size_t argv_size = (argc_orig + 1) * sizeof(char *);
+    char **argv = malloc(argv_size);
+    if (!argv)
+        /* OOM */
+        return;
+    memcpy(argv, argv_orig, argv_size);
+
     /* translate cmd-line args for cppcheck */
-    char **argv = argv_orig;
     const int argc_cmd = translate_args_for_cppcheck(argc_orig, argv);
     if (argc_cmd <= 0)
         /* do not start cppcheck */
@@ -362,15 +369,15 @@ void consider_running_cppcheck(const int argc_orig, char **const argv_orig)
 
     const int argc_total = argc_cmd + cppcheck_def_argc;
     if (argc_orig < argc_total) {
-        /* allocate argv on heap */
-        const size_t argv_size = sizeof(char *) * argc_total;
-        char **argv_dup = malloc(argv_size);
-        if (!argv_dup)
+        /* enlarge the argv array */
+        argv_size = (argc_total + 1) * sizeof(char *);
+        char **argv_new = realloc(argv, argv_size);
+        if (!argv_new) {
             /* OOM */
+            free(argv);
             return;
-
-        memcpy(argv_dup, argv, argv_size);
-        argv = argv_dup;
+        }
+        argv = argv_new;
     }
 
     /* append default cppcheck args */
@@ -393,9 +400,8 @@ void consider_running_cppcheck(const int argc_orig, char **const argv_orig)
     if (pid_cppcheck <= 0)
         fail("failed to launch cppcheck (%s)", strerror(errno));
 
-    if (argv_orig != argv)
-        /* FIXME: release also the memory allocated by asprintf() */
-        free(argv);
+    /* FIXME: release also the memory allocated by asprintf() */
+    free(argv);
 }
 
 int run_compiler_and_cppcheck(const char *tool, const int argc, char **argv)
