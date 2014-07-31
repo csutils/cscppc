@@ -404,6 +404,27 @@ void consider_running_cppcheck(const int argc_orig, char **const argv_orig)
     free(argv);
 }
 
+/* FIXME: copy/pasted from cswrap */
+void tag_process_name(const int argc, char *argv[])
+{
+    static const char prefix[] = "[cscppc] ";
+    static const size_t prefix_len = sizeof prefix - 1U;
+
+    /* obtain bounds of the array pointed by argv[] */
+    char *beg = argv[0];
+    char *end = argv[argc - 1];
+    while (*end++)
+        ;
+    const size_t total = end - beg;
+    if (total <= prefix_len)
+        /* not enough space to insert the prefix */
+        return;
+
+    /* shift the contents by prefix_len to right and insert the prefix */
+    memmove(beg + prefix_len, beg, total - prefix_len - 1U);
+    memcpy(beg, prefix, prefix_len);
+}
+
 int run_compiler_and_cppcheck(const char *tool, const int argc, char **argv)
 {
     if (!install_signal_forwarder())
@@ -414,6 +435,8 @@ int run_compiler_and_cppcheck(const char *tool, const int argc, char **argv)
         return fail("failed to launch %s (%s)", tool, strerror(errno));
 
     consider_running_cppcheck(argc, argv);
+
+    tag_process_name(argc, argv);
 
     const int status = wait_for(&pid_compiler);
 
