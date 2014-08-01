@@ -132,7 +132,7 @@ bool remove_self_from_path(const char *tool, char *path)
 
         /* compare the canonicalized basename with wname */
         char *exec_path = realpath(raw_path, NULL);
-        const bool self = exec_path && !strcmp(wname, basename(exec_path));
+        const bool self = exec_path && STREQ(wname, basename(exec_path));
         free(exec_path);
         free(raw_path);
 

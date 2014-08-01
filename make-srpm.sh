@@ -73,11 +73,9 @@ Summary:    A compiler wrapper that runs cppcheck in background
 
 Group:      Development/Tools
 License:    GPLv3+
-URL:        http://git.fedorahosted.org/cgit/cscppc.git
-Source0:    http://git.fedorahosted.org/cgit/cscppc.git/snapshot/$SRC
+URL:        https://git.fedorahosted.org/cgit/cscppc.git
+Source0:    https://git.fedorahosted.org/cgit/cscppc.git/snapshot/$SRC
 BuildRoot:  %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
-
-Obsoletes:  cppcheck-gcc
 
 BuildRequires: asciidoc
 
