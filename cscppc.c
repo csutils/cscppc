@@ -45,6 +45,8 @@ const char *wrapper_path = "";
 
 const char *wrapper_proc_prefix = "[cscppc] ";
 
+const char *wrapper_debug_envvar_name = "DEBUG_CSCPPC";
+
 const char *analyzer_name = "cppcheck";
 
 static const char *cppcheck_def_argv[] = {
@@ -390,7 +392,7 @@ void consider_running_cppcheck(const int argc_orig, char **const argv_orig)
     /* make sure the cppcheck process is named cppcheck */
     argv[0] = (char *) analyzer_name;
 
-    const char *var_debug = getenv("DEBUG_CPPCHECK_GCC");
+    const char *var_debug = getenv(wrapper_debug_envvar_name);
     if (var_debug && *var_debug) {
         const pid_t pid = getpid();
 

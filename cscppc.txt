@@ -92,7 +92,7 @@ affect the resulting exit status.
 
 ENVIRONMENT VARIABLES
 ---------------------
-*DEBUG_CPPCHECK_GCC*::
+*DEBUG_CSCPPC*::
     If set to a non-empty string, cscppc outputs the list of parameters given
     to cppcheck to the standard output.
 
