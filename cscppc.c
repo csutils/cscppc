@@ -49,7 +49,7 @@ const char *wrapper_debug_envvar_name = "DEBUG_CSCPPC";
 
 const char *analyzer_name = "cppcheck";
 
-static const char *cppcheck_def_argv[] = {
+static const char *analyzer_def_argv[] = {
     "-D__GNUC__",
     "-D__STDC__",
 #if __WORDSIZE == 32
@@ -68,12 +68,12 @@ static const char *cppcheck_def_argv[] = {
     NULL
 };
 
-static const size_t cppcheck_def_argc =
-    sizeof(cppcheck_def_argv)/
-    sizeof(cppcheck_def_argv[0]);
+static const size_t analyzer_def_argc =
+    sizeof(analyzer_def_argv)/
+    sizeof(analyzer_def_argv[0]);
 
 static volatile pid_t pid_compiler;
-static volatile pid_t pid_cppcheck;
+static volatile pid_t pid_analyzer;
 
 /* print error and return EXIT_FAILURE */
 static int fail(const char *fmt, ...)
@@ -172,8 +172,8 @@ void signal_forwarder(int signum)
     if (pid_compiler)
         kill(pid_compiler, signum);
 
-    if (pid_cppcheck)
-        kill(pid_cppcheck, signum);
+    if (pid_analyzer)
+        kill(pid_analyzer, signum);
 
     errno = saved_errno;
 }
@@ -293,7 +293,7 @@ int /* args remain */ drop_arg(int *pargc, char **argv, const int i)
     return args_remain;
 }
 
-int translate_args_for_cppcheck(int argc, char **argv)
+int translate_args_for_analyzer(int argc, char **argv)
 {
     int cnt_files = 0;
 
@@ -301,7 +301,7 @@ int translate_args_for_cppcheck(int argc, char **argv)
     for (i = 1; i < argc; ++i) {
         const char *arg = argv[i];
         if (STREQ(arg, "-E"))
-            /* preprocessing --> bypass cppcheck in order to not break ccache */
+            /* preprocessing --> bypass analyzer in order to not break ccache */
             return -1;
 
         if (is_def_inc(arg)) {
@@ -318,7 +318,7 @@ int translate_args_for_cppcheck(int argc, char **argv)
         bool black_listed = false;
         if (is_input_file(arg, &black_listed)) {
             if (black_listed)
-                /* black-listed input file --> do not start cppcheck */
+                /* black-listed input file --> do not start analyzer */
                 return -1;
 
             /* pass input file name as it is */
@@ -357,7 +357,7 @@ int translate_args_for_cppcheck(int argc, char **argv)
     return argc;
 }
 
-void consider_running_cppcheck(const int argc_orig, char **const argv_orig)
+void consider_running_analyzer(const int argc_orig, char **const argv_orig)
 {
     /* clone the argv array */
     size_t argv_size = (argc_orig + 1) * sizeof(char *);
@@ -367,13 +367,13 @@ void consider_running_cppcheck(const int argc_orig, char **const argv_orig)
         return;
     memcpy(argv, argv_orig, argv_size);
 
-    /* translate cmd-line args for cppcheck */
-    const int argc_cmd = translate_args_for_cppcheck(argc_orig, argv);
+    /* translate cmd-line args for analyzer */
+    const int argc_cmd = translate_args_for_analyzer(argc_orig, argv);
     if (argc_cmd <= 0)
-        /* do not start cppcheck */
+        /* do not start analyzer */
         return;
 
-    const int argc_total = argc_cmd + cppcheck_def_argc;
+    const int argc_total = argc_cmd + analyzer_def_argc;
     if (argc_orig < argc_total) {
         /* enlarge the argv array */
         argv_size = (argc_total + 1) * sizeof(char *);
@@ -386,10 +386,10 @@ void consider_running_cppcheck(const int argc_orig, char **const argv_orig)
         argv = argv_new;
     }
 
-    /* append default cppcheck args */
-    memcpy(argv + argc_cmd, cppcheck_def_argv, sizeof cppcheck_def_argv);
+    /* append default analyzer args */
+    memcpy(argv + argc_cmd, analyzer_def_argv, sizeof analyzer_def_argv);
 
-    /* make sure the cppcheck process is named cppcheck */
+    /* make sure the analyzer process is named analyzer */
     argv[0] = (char *) analyzer_name;
 
     const char *var_debug = getenv(wrapper_debug_envvar_name);
@@ -401,9 +401,9 @@ void consider_running_cppcheck(const int argc_orig, char **const argv_orig)
             printf("%s[%d]: argv[%d] = %s\n", wrapper_name, pid, i, argv[i]);
     }
 
-    /* try to start cppcheck */
-    pid_cppcheck = launch_tool(analyzer_name, argv);
-    if (pid_cppcheck <= 0)
+    /* try to start analyzer */
+    pid_analyzer = launch_tool(analyzer_name, argv);
+    if (pid_analyzer <= 0)
         fail("failed to launch %s (%s)", analyzer_name, strerror(errno));
 
     /* FIXME: release also the memory allocated by asprintf() */
@@ -430,7 +430,7 @@ void tag_process_name(const int argc, char *argv[])
     memcpy(beg, wrapper_proc_prefix, prefix_len);
 }
 
-int run_compiler_and_cppcheck(const char *tool, const int argc, char **argv)
+int run_compiler_and_analyzer(const char *tool, const int argc, char **argv)
 {
     if (!install_signal_forwarder())
         return fail("unable to install signal forwarder");
@@ -439,19 +439,19 @@ int run_compiler_and_cppcheck(const char *tool, const int argc, char **argv)
     if (pid_compiler <= 0)
         return fail("failed to launch %s (%s)", tool, strerror(errno));
 
-    consider_running_cppcheck(argc, argv);
+    consider_running_analyzer(argc, argv);
 
     tag_process_name(argc, argv);
 
     const int status = wait_for(&pid_compiler);
 
-    if (0 < pid_cppcheck) {
+    if (0 < pid_analyzer) {
         if (status)
-            /* compilation failed --> kill cppcheck now! */
-            kill(pid_cppcheck, SIGTERM);
+            /* compilation failed --> kill analyzer now! */
+            kill(pid_analyzer, SIGTERM);
 
-        /* cppcheck was started, wait till it finishes */
-        wait_for(&pid_cppcheck);
+        /* analyzer was started, wait till it finishes */
+        wait_for(&pid_analyzer);
     }
 
     return status;
@@ -476,7 +476,7 @@ int main(int argc, char *argv[])
     /* remove self from $PATH in order to avoid infinite recursion */
     char *path = getenv("PATH");
     status = (remove_self_from_path(tool, path))
-        ? run_compiler_and_cppcheck(tool, argc, argv)
+        ? run_compiler_and_analyzer(tool, argc, argv)
         : fail("symlink '%s -> %s' not found in $PATH (%s)",
                 tool, wrapper_name, path);
 
