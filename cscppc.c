@@ -49,6 +49,8 @@ const char *wrapper_debug_envvar_name = "DEBUG_CSCPPC";
 
 const char *analyzer_name = "cppcheck";
 
+const bool analyzer_is_gcc_compatible = false;
+
 static const char *analyzer_def_argv[] = {
     "-D__GNUC__",
     "-D__STDC__",
@@ -241,13 +243,21 @@ int wait_for(volatile pid_t *ppid)
 bool is_def_inc(const char *arg)
 {
     return MATCH_PREFIX(arg, "-D")
-        || MATCH_PREFIX(arg, "-I");
+        || MATCH_PREFIX(arg, "-I")
+        || (analyzer_is_gcc_compatible
+                && (STREQ(arg, "-include")
+                    || STREQ(arg, "-iquote")
+                    || STREQ(arg, "-isystem")));
 }
 
 bool is_bare_def_inc(const char *arg)
 {
     return STREQ(arg, "-D")
-        || STREQ(arg, "-I");
+        || STREQ(arg, "-I")
+        || (analyzer_is_gcc_compatible
+                && (STREQ(arg, "-include")
+                    || STREQ(arg, "-iquote")
+                    || STREQ(arg, "-isystem")));
 }
 
 bool is_input_file_suffix(const char *suffix)
@@ -326,6 +336,10 @@ int translate_args_for_analyzer(int argc, char **argv)
             continue;
         }
 
+        if (analyzer_is_gcc_compatible)
+            /* already handled by is_def_inc() */
+            goto drop_it;
+
         /* translate -iquote and -isystem to -I... */
         if ((STREQ(arg, "-iquote") || STREQ(arg, "-isystem"))
                 && (0 < drop_arg(&argc, argv, i)))
@@ -346,6 +360,7 @@ int translate_args_for_analyzer(int argc, char **argv)
             continue;
         }
 
+drop_it:
         /* drop anything else */
         drop_arg(&argc, argv, i--);
     }
