@@ -51,7 +51,7 @@ const char *analyzer_name = "cppcheck";
 
 const bool analyzer_is_gcc_compatible = false;
 
-static const char *analyzer_def_argv[] = {
+static const char *analyzer_def_arg_list[] = {
     "-D__GNUC__",
     "-D__STDC__",
 #if __WORDSIZE == 32
@@ -70,9 +70,11 @@ static const char *analyzer_def_argv[] = {
     NULL
 };
 
-static const size_t analyzer_def_argc =
-    sizeof(analyzer_def_argv)/
-    sizeof(analyzer_def_argv[0]);
+const char **analyzer_def_argv = analyzer_def_arg_list;
+
+const size_t analyzer_def_argc =
+    sizeof(analyzer_def_arg_list)/
+    sizeof(analyzer_def_arg_list[0]);
 
 static volatile pid_t pid_compiler;
 static volatile pid_t pid_analyzer;
@@ -402,7 +404,8 @@ void consider_running_analyzer(const int argc_orig, char **const argv_orig)
     }
 
     /* append default analyzer args */
-    memcpy(argv + argc_cmd, analyzer_def_argv, sizeof analyzer_def_argv);
+    memcpy(argv + argc_cmd, analyzer_def_argv,
+            analyzer_def_argc * sizeof(char *));
 
     /* make sure the analyzer process is named analyzer */
     argv[0] = (char *) analyzer_name;
