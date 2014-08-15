@@ -1,5 +1,5 @@
+*.o
 /cscppc
 /cscppc.1
-/cscppc.o
 /cscppc.xml
 /cscppc-*.src.rpm

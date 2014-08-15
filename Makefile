@@ -5,10 +5,12 @@ LDFLAGS ?= -pthread
 
 all: cscppc cscppc.1
 
-cscppc: cscppc.o
+cscppc: cscppc.o cswrap-core.o
+
+cscppc.o cswrap-core.o: cswrap-core.h
 
 cscppc.1: cscppc.txt
 	a2x -f manpage -v $<
 
 clean:
-	rm -f cscppc cscppc.o cscppc.1 cscppc.xml
+	rm -f cscppc *.o cscppc.1 cscppc.xml
