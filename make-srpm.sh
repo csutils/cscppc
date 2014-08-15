@@ -94,12 +94,19 @@ Requires: cppcheck >= 1.58
 This package contains the cscppc compiler wrapper that runs cppcheck in
 background fully transparently.
 
+%package -n csclng
+Summary: A compiler wrapper that runs Clang in background
+
+%description -n csclng
+This package contains the csclng compiler wrapper that runs the Clang analyzer
+in background fully transparently.
+
 %prep
 %setup -q
 
 %build
 make %{?_smp_mflags} \\
-    CFLAGS="\$RPM_OPT_FLAGS -DPATH_TO_CSCPPC='\\"%{_libdir}/cscppc\\"'" \\
+    CFLAGS="\$RPM_OPT_FLAGS -DPATH_TO_CSCPPC='\\"%{_libdir}/cscppc\\"' -DPATH_TO_CSCLNG='\\"%{_libdir}/csclng\\"'" \\
     LDFLAGS="\$RPM_OPT_FLAGS -static -pthread"
 
 %clean
@@ -114,10 +121,11 @@ install -m0755 -d \\
     "\$RPM_BUILD_ROOT%{_datadir}/cscppc"        \\
     "\$RPM_BUILD_ROOT%{_libdir}"                \\
     "\$RPM_BUILD_ROOT%{_libdir}/cscppc"         \\
+    "\$RPM_BUILD_ROOT%{_libdir}/csclng"         \\
     "\$RPM_BUILD_ROOT%{_mandir}/man1"
 
-install -p -m0755 %{name} "\$RPM_BUILD_ROOT%{_bindir}"
-install -p -m0644 %{name}.1 "\$RPM_BUILD_ROOT%{_mandir}/man1"
+install -p -m0755 %{name} csclng "\$RPM_BUILD_ROOT%{_bindir}"
+install -p -m0644 %{name}.1 csclng.1 "\$RPM_BUILD_ROOT%{_mandir}/man1"
 install -p -m0644 default.supp "\$RPM_BUILD_ROOT%{_datadir}/cscppc"
 
 for i in c++ cc g++ gcc \\
@@ -126,6 +134,7 @@ for i in c++ cc g++ gcc \\
     %{_arch}-redhat-linux-gcc
 do
     ln -s ../../bin/cscppc "\$RPM_BUILD_ROOT%{_libdir}/cscppc/\$i"
+    ln -s ../../bin/csclng "\$RPM_BUILD_ROOT%{_libdir}/csclng/\$i"
 done
 
 %files
@@ -134,6 +143,13 @@ done
 %{_datadir}/cscppc
 %{_libdir}/cscppc
 %{_mandir}/man1/%{name}.1*
+%doc COPYING README
+
+%files -n csclng
+%defattr(-,root,root,-)
+%{_bindir}/csclng
+%{_libdir}/csclng
+%{_mandir}/man1/csclng.1*
 %doc COPYING README
 EOF
 

@@ -1,4 +1,7 @@
 *.o
+/csclng
+/csclng.1
+/csclng.xml
 /cscppc
 /cscppc.1
 /cscppc.xml
