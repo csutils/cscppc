@@ -35,13 +35,17 @@
 #define STREQ(a, b) (!strcmp(a, b))
 #define MATCH_PREFIX(str, pref) (!strncmp(str, pref, sizeof(pref) - 1U))
 
-#ifdef PATH_TO_WRAP
-const char *path_to_wrap = PATH_TO_WRAP;
+const char *wrapper_name = "cscppc";
+
+#ifdef PATH_TO_CSCPPC
+const char *wrapper_path = PATH_TO_CSCPPC;
 #else
-const char *path_to_wrap = "";
+const char *wrapper_path = "";
 #endif
 
-static const char wname[] = "cscppc";
+const char *wrapper_proc_prefix = "[cscppc] ";
+
+const char *analyzer_name = "cppcheck";
 
 static const char *cppcheck_def_argv[] = {
     "-D__GNUC__",
@@ -75,7 +79,7 @@ static int fail(const char *fmt, ...)
     va_list ap;
     va_start(ap, fmt);
 
-    fprintf(stderr, "%s: error: ", wname);
+    fprintf(stderr, "%s: error: ", wrapper_name);
     vfprintf(stderr, fmt, ap);
     fputc('\n', stderr);
 
@@ -87,10 +91,10 @@ static int usage(char *argv[])
 {
     fprintf(stderr, "Usage:\n\
     export PATH=\"`%s --print-path-to-wrap`:$PATH\"\n\n\
-    %s is a compiler wrapper that runs cppcheck in background.  Create a\n\
+    %s is a compiler wrapper that runs %s in background.  Create a\n\
     symbolic link to %s named as your compiler (gcc, g++, ...) and put it\n\
     to your $PATH.  %s --help prints this text to standard error output.\n",
-    wname, wname, wname, wname);
+    wrapper_name, wrapper_name, analyzer_name, wrapper_name, wrapper_name);
 
     for (; *argv; ++argv)
         if (STREQ("--help", *argv))
@@ -104,7 +108,7 @@ static int usage(char *argv[])
 static int handle_args(const int argc, char *argv[])
 {
     if (argc == 2 && STREQ("--print-path-to-wrap", argv[1])) {
-        printf("%s\n", path_to_wrap);
+        printf("%s\n", wrapper_path);
         return EXIT_SUCCESS;
     }
 
@@ -130,9 +134,9 @@ bool remove_self_from_path(const char *tool, char *path)
         if (-1 == asprintf(&raw_path, "%s/%s", path, tool))
             return false;
 
-        /* compare the canonicalized basename with wname */
+        /* compare the canonicalized basename with wrapper_name */
         char *exec_path = realpath(raw_path, NULL);
-        const bool self = exec_path && STREQ(wname, basename(exec_path));
+        const bool self = exec_path && STREQ(wrapper_name, basename(exec_path));
         free(exec_path);
         free(raw_path);
 
@@ -384,7 +388,7 @@ void consider_running_cppcheck(const int argc_orig, char **const argv_orig)
     memcpy(argv + argc_cmd, cppcheck_def_argv, sizeof cppcheck_def_argv);
 
     /* make sure the cppcheck process is named cppcheck */
-    argv[0] = "cppcheck";
+    argv[0] = (char *) analyzer_name;
 
     const char *var_debug = getenv("DEBUG_CPPCHECK_GCC");
     if (var_debug && *var_debug) {
@@ -392,13 +396,13 @@ void consider_running_cppcheck(const int argc_orig, char **const argv_orig)
 
         int i;
         for(i = 0; i < argc_total; ++i)
-            printf("cscppc[%d]: argv[%d] = %s\n", pid, i, argv[i]);
+            printf("%s[%d]: argv[%d] = %s\n", wrapper_name, pid, i, argv[i]);
     }
 
     /* try to start cppcheck */
-    pid_cppcheck = launch_tool("cppcheck", argv);
+    pid_cppcheck = launch_tool(analyzer_name, argv);
     if (pid_cppcheck <= 0)
-        fail("failed to launch cppcheck (%s)", strerror(errno));
+        fail("failed to launch %s (%s)", analyzer_name, strerror(errno));
 
     /* FIXME: release also the memory allocated by asprintf() */
     free(argv);
@@ -407,8 +411,7 @@ void consider_running_cppcheck(const int argc_orig, char **const argv_orig)
 /* FIXME: copy/pasted from cswrap */
 void tag_process_name(const int argc, char *argv[])
 {
-    static const char prefix[] = "[cscppc] ";
-    static const size_t prefix_len = sizeof prefix - 1U;
+    const size_t prefix_len = strlen(wrapper_proc_prefix);
 
     /* obtain bounds of the array pointed by argv[] */
     char *beg = argv[0];
@@ -417,12 +420,12 @@ void tag_process_name(const int argc, char *argv[])
         ;
     const size_t total = end - beg;
     if (total <= prefix_len)
-        /* not enough space to insert the prefix */
+        /* not enough space to insert the wrapper_proc_prefix */
         return;
 
     /* shift the contents by prefix_len to right and insert the prefix */
     memmove(beg + prefix_len, beg, total - prefix_len - 1U);
-    memcpy(beg, prefix, prefix_len);
+    memcpy(beg, wrapper_proc_prefix, prefix_len);
 }
 
 int run_compiler_and_cppcheck(const char *tool, const int argc, char **argv)
@@ -460,7 +463,7 @@ int main(int argc, char *argv[])
 
     /* check which tool we are asked to run via this wrapper */
     char *tool = basename(argv[0]);
-    if (STREQ(tool, wname))
+    if (STREQ(tool, wrapper_name))
         return handle_args(argc, argv);
 
     /* duplicate the string as basename() return value is not valid forever */
@@ -472,7 +475,8 @@ int main(int argc, char *argv[])
     char *path = getenv("PATH");
     status = (remove_self_from_path(tool, path))
         ? run_compiler_and_cppcheck(tool, argc, argv)
-        : fail("symlink '%s -> %s' not found in $PATH (%s)", tool, wname, path);
+        : fail("symlink '%s -> %s' not found in $PATH (%s)",
+                tool, wrapper_name, path);
 
     free(tool);
     return status;
