@@ -75,7 +75,6 @@ Group:      Development/Tools
 License:    GPLv3+
 URL:        https://git.fedorahosted.org/cgit/cscppc.git
 Source0:    https://git.fedorahosted.org/cgit/cscppc.git/snapshot/$SRC
-BuildRoot:  %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildRequires: asciidoc
 
@@ -109,12 +108,7 @@ make %{?_smp_mflags} \\
     CFLAGS="\$RPM_OPT_FLAGS -DPATH_TO_CSCPPC='\\"%{_libdir}/cscppc\\"' -DPATH_TO_CSCLNG='\\"%{_libdir}/csclng\\"'" \\
     LDFLAGS="\$RPM_OPT_FLAGS -static -pthread"
 
-%clean
-rm -rf "\$RPM_BUILD_ROOT"
-
 %install
-rm -rf "\$RPM_BUILD_ROOT"
-
 install -m0755 -d \\
     "\$RPM_BUILD_ROOT%{_bindir}"                \\
     "\$RPM_BUILD_ROOT%{_datadir}"               \\
@@ -138,7 +132,6 @@ do
 done
 
 %files
-%defattr(-,root,root,-)
 %{_bindir}/cscppc
 %{_datadir}/cscppc
 %{_libdir}/cscppc
@@ -146,7 +139,6 @@ done
 %doc COPYING README
 
 %files -n csclng
-%defattr(-,root,root,-)
 %{_bindir}/csclng
 %{_libdir}/csclng
 %{_mandir}/man1/csclng.1*
@@ -156,6 +148,4 @@ EOF
 rpmbuild -bs "$SPEC"                            \
     --define "_sourcedir $TMP"                  \
     --define "_specdir $TMP"                    \
-    --define "_srcrpmdir $DST"                  \
-    --define "_source_filedigest_algorithm md5" \
-    --define "_binary_filedigest_algorithm md5"
+    --define "_srcrpmdir $DST"
