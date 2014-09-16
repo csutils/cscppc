@@ -118,17 +118,20 @@ install -m0755 -d \\
     "\$RPM_BUILD_ROOT%{_libdir}/csclng"         \\
     "\$RPM_BUILD_ROOT%{_mandir}/man1"
 
-install -p -m0755 %{name} csclng "\$RPM_BUILD_ROOT%{_bindir}"
+install -p -m0755 %{name} csclng csclng++ "\$RPM_BUILD_ROOT%{_bindir}"
 install -p -m0644 %{name}.1 csclng.1 "\$RPM_BUILD_ROOT%{_mandir}/man1"
 install -p -m0644 default.supp "\$RPM_BUILD_ROOT%{_datadir}/cscppc"
 
-for i in c++ cc g++ gcc \\
-    %{_arch}-redhat-linux-c++ \\
-    %{_arch}-redhat-linux-g++ \\
-    %{_arch}-redhat-linux-gcc
+for i in cc gcc %{_arch}-redhat-linux-gcc
 do
     ln -s ../../bin/cscppc "\$RPM_BUILD_ROOT%{_libdir}/cscppc/\$i"
     ln -s ../../bin/csclng "\$RPM_BUILD_ROOT%{_libdir}/csclng/\$i"
+done
+
+for i in c++ g++ %{_arch}-redhat-linux-c++ %{_arch}-redhat-linux-g++
+do
+    ln -s ../../bin/cscppc   "\$RPM_BUILD_ROOT%{_libdir}/cscppc/\$i"
+    ln -s ../../bin/csclng++ "\$RPM_BUILD_ROOT%{_libdir}/csclng/\$i"
 done
 
 %files
@@ -140,6 +143,7 @@ done
 
 %files -n csclng
 %{_bindir}/csclng
+%{_bindir}/csclng++
 %{_libdir}/csclng
 %{_mandir}/man1/csclng.1*
 %doc COPYING README

@@ -5,7 +5,7 @@ symbolic link to cscppc named as your compiler (gcc, g++, ...) and put it
 to your $PATH.  cscppc --help prints usage to standard error output.  You
 can find the up2date sources in the following repository:
 
-    http://git.fedorahosted.org/cgit/cscppc.git
+    https://git.fedorahosted.org/cgit/cscppc.git
 
 Please report bugs and feature requests to the following mailing-list:
 
