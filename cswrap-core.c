@@ -298,9 +298,14 @@ int translate_args_for_analyzer(int argc, char **argv)
             continue;
         }
 
-        if (analyzer_is_gcc_compatible)
-            /* already handled by is_def_inc() */
+        if (analyzer_is_gcc_compatible) {
+            if (MATCH_PREFIX(arg, "-m") || MATCH_PREFIX(arg, "-std"))
+                /* pass -m{16,32,64} and -std=... directly to the analyzer */
+                continue;
+
+            /* -i{nclude,quote,system} are already handled by is_def_inc() */
             goto drop_it;
+        }
 
         /* translate -iquote and -isystem to -I... */
         if ((STREQ(arg, "-iquote") || STREQ(arg, "-isystem"))
