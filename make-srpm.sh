@@ -95,6 +95,7 @@ background fully transparently.
 
 %package -n csclng
 Summary: A compiler wrapper that runs Clang in background
+Conflicts: csmock-plugin-clang < 1.5.0
 
 %description -n csclng
 This package contains the csclng compiler wrapper that runs the Clang analyzer
