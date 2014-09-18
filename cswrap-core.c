@@ -299,7 +299,8 @@ int translate_args_for_analyzer(int argc, char **argv)
         }
 
         if (analyzer_is_gcc_compatible) {
-            if (MATCH_PREFIX(arg, "-m") || MATCH_PREFIX(arg, "-std"))
+            if (STREQ(arg, "-m16") || STREQ(arg, "-m32") || STREQ(arg, "-m64")
+                    || MATCH_PREFIX(arg, "-std"))
                 /* pass -m{16,32,64} and -std=... directly to the analyzer */
                 continue;
 
