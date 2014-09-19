@@ -19,6 +19,9 @@
 
 #define _GNU_SOURCE 
 
+/* for waitid() */
+#define _POSIX_C_SOURCE 200809L
+
 #include "cswrap-core.h"
 
 #include <errno.h>
@@ -180,26 +183,24 @@ pid_t launch_tool(const char *tool, char **argv)
             : /* command not executable */ 0x7E);
 }
 
-int wait_for(volatile pid_t *ppid)
+int wait_for(const pid_t pid)
 {
-    const pid_t pid = *ppid;
+    for (;;) {
+        siginfo_t si;
+        while (-1 == waitid(P_ALL, 0, &si, WEXITED))
+            if (EINTR != errno)
+                return fail("waitid() failed while waiting for %d: %s", pid,
+                        strerror(errno));
 
-    int status;
-    while (-1 == waitpid(pid, &status, 0))
-        if (EINTR != errno)
-            return fail("waitpid(%d) failed: %s", pid, strerror(errno));
+        if (pid_compiler == si.si_pid)
+            pid_compiler = 0;
 
-    *ppid = (pid_t) 0;
+        if (pid_analyzer == si.si_pid)
+            pid_analyzer = 0;
 
-    if (WIFEXITED(status))
-        /* propagate the exit status of the child */
-        return WEXITSTATUS(status);
-
-    if (WIFSIGNALED(status))
-        /* child signalled to die */
-        return 0x80 + WTERMSIG(status);
-
-    return fail("waitpid(%d) returned unexpected status: %d", pid, status);
+        if (pid == si.si_pid)
+            return si.si_status;
+    }
 }
 
 bool is_def_inc(const char *arg)
@@ -427,7 +428,7 @@ int run_compiler_and_analyzer(const char *tool, const int argc, char **argv)
 
     tag_process_name(argc, argv);
 
-    const int status = wait_for(&pid_compiler);
+    const int status = wait_for(pid_compiler);
 
     if (0 < pid_analyzer) {
         if (status)
@@ -435,7 +436,7 @@ int run_compiler_and_analyzer(const char *tool, const int argc, char **argv)
             kill(pid_analyzer, SIGTERM);
 
         /* analyzer was started, wait till it finishes */
-        wait_for(&pid_analyzer);
+        wait_for(pid_analyzer);
     }
 
     return status;

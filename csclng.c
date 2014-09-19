@@ -23,7 +23,7 @@
 
 const char *wrapper_name = "csclng";
 
-#ifdef PATH_TO_CSCPPC
+#ifdef PATH_TO_CSCLNG
 const char *wrapper_path = PATH_TO_CSCLNG;
 #else
 const char *wrapper_path = "";
