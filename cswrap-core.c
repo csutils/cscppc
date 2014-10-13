@@ -240,7 +240,7 @@ bool is_black_listed_file(const char *name)
         || strstr(name, "/CMakeTmp/");
 }
 
-bool is_input_file(const char *arg, bool *black_listed)
+bool is_input_file(const char *arg)
 {
     const char *suffix = strrchr(arg, '.');
     if (!suffix)
@@ -249,12 +249,9 @@ bool is_input_file(const char *arg, bool *black_listed)
 
     /* skip behind the dot */
     ++suffix;
-    if (!is_input_file_suffix(suffix))
-        /* not a know input file suffix */
-        return false;
 
-    *black_listed = is_black_listed_file(arg);
-    return true;
+    /* check for a known input file suffix */
+    return is_input_file_suffix(suffix);
 }
 
 int /* args remain */ drop_arg(int *pargc, char **argv, const int i)
@@ -288,9 +285,8 @@ int translate_args_for_analyzer(int argc, char **argv)
             continue;
         }
 
-        bool black_listed = false;
-        if (is_input_file(arg, &black_listed)) {
-            if (black_listed)
+        if (is_input_file(arg)) {
+            if (is_black_listed_file(arg))
                 /* black-listed input file --> do not start analyzer */
                 return -1;
 
@@ -374,11 +370,12 @@ void consider_running_analyzer(const int argc_orig, char **const argv_orig)
     memcpy(argv + argc_cmd, analyzer_def_argv,
             analyzer_def_argc * sizeof(char *));
 
-    /* make sure the analyzer process is named analyzer */
+    /* make sure that the analyzer process is named analyzer_name */
     argv[0] = (char *) analyzer_name;
 
     const char *var_debug = getenv(wrapper_debug_envvar_name);
     if (var_debug && *var_debug) {
+        /* run-time debugging enabled */
         const pid_t pid = getpid();
 
         int i;
