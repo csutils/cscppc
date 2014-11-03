@@ -1,30 +1,41 @@
-CFLAGS ?= -std=gnu99 -Wall -Wextra -pedantic -O2 -g
-LDFLAGS ?= -pthread
+# Copyright (C) 2014 Red Hat, Inc.
+#
+# This file is part of cscppc.
+#
+# cscppc is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# any later version.
+#
+# cscppc is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with cscppc.  If not, see <http://www.gnu.org/licenses/>.
 
-.PHONY: all bin clean doc
+CMAKE ?= cmake
+CTEST ?= ctest
 
-all: bin doc
+.PHONY: all check clean distclean distcheck install
 
-bin: csclng csclng++ cscppc
+all:
+	mkdir -p cscppc_build
+	cd cscppc_build && $(CMAKE) ..
+	$(MAKE) -C cscppc_build
 
-doc: csclng.1 cscppc.1
-
-csclng: csclng.o cswrap-core.o
-
-csclng++: csclng++.o cswrap-core.o
-
-cscppc: cscppc.o cswrap-core.o
-
-csclng.o csclng++.o cscppc.o cswrap-core.o: cswrap-core.h
-
-csclng++.c: csclng.c
-	sed -e 's/csclng/csclng++/g' -e 's/clang/clang++/g' $< >$@
-
-csclng.1: csclng.txt
-	a2x -f manpage -v $<
-
-cscppc.1: cscppc.txt
-	a2x -f manpage -v $<
+check: all
+	cd cscppc_build && $(CTEST) --output-on-failure
 
 clean:
-	rm -fv {csclng,cscppc}{,.{1,o,xml}} csclng++{,.{c,o}} cswrap-core.o
+	if test -e cscppc_build/Makefile; then $(MAKE) clean -C cscppc_build; fi
+
+distclean:
+	rm -rf cscppc_build
+
+distcheck: distclean
+	$(MAKE) check
+
+install: all
+	$(MAKE) -C cscppc_build install

@@ -55,7 +55,13 @@ printf "%s: preparing a release of \033[1;32m%s\033[0m\n" "$SELF" "$NV"
 
 TMP="`mktemp -d`"
 trap "echo --- $SELF: removing $TMP... 2>&1; rm -rf '$TMP'" EXIT
-test -d "$TMP" || die "mktemp failed"
+cd "$TMP" >/dev/null || die "mktemp failed"
+
+# clone the repository
+git clone "$REPO" "$PKG"                || die "git clone failed"
+cd "$PKG"                               || die "git clone failed"
+
+make -j9 distcheck CTEST='ctest -j9'    || die "'make distcheck' has failed"
 
 SRC_TAR="${NV}.tar"
 SRC="${SRC_TAR}.xz"
@@ -77,6 +83,7 @@ URL:        https://git.fedorahosted.org/cgit/cscppc.git
 Source0:    https://git.fedorahosted.org/cgit/cscppc.git/snapshot/$SRC
 
 BuildRequires: asciidoc
+BuildRequires: cmake
 
 # csmock copies the resulting cscppc binary into mock chroot, which may contain
 # an older (e.g. RHEL-5) version of glibc, and it would not dynamically link
@@ -105,9 +112,16 @@ in background fully transparently.
 %setup -q
 
 %build
-make %{?_smp_mflags} \\
-    CFLAGS="\$RPM_OPT_FLAGS -DPATH_TO_CSCPPC='\\"%{_libdir}/cscppc\\"' -DPATH_TO_CSCLNG='\\"%{_libdir}/csclng\\"'" \\
-    LDFLAGS="\$RPM_OPT_FLAGS -static -pthread"
+mkdir cscppc_build
+cd cscppc_build
+export CFLAGS="\$RPM_OPT_FLAGS"' -DPATH_TO_CSCPPC=\\"%{_libdir}/cscppc\\" -DPATH_TO_CSCLNG=\\"%{_libdir}/csclng\\"'
+export LDFLAGS="\$RPM_OPT_FLAGS -static -pthread"
+%cmake ..
+make %{?_smp_mflags} VERBOSE=yes
+
+%check
+cd cscppc_build
+ctest %{?_smp_mflags} --output-on-failure
 
 %install
 install -m0755 -d \\
@@ -119,9 +133,8 @@ install -m0755 -d \\
     "\$RPM_BUILD_ROOT%{_libdir}/csclng"         \\
     "\$RPM_BUILD_ROOT%{_mandir}/man1"
 
-install -p -m0755 %{name} csclng csclng++ "\$RPM_BUILD_ROOT%{_bindir}"
-install -p -m0644 %{name}.1 csclng.1 "\$RPM_BUILD_ROOT%{_mandir}/man1"
-install -p -m0644 default.supp "\$RPM_BUILD_ROOT%{_datadir}/cscppc"
+cd cscppc_build
+make install DESTDIR="\$RPM_BUILD_ROOT"
 
 for i in cc gcc %{_arch}-redhat-linux-gcc
 do
