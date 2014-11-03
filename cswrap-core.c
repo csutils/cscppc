@@ -136,10 +136,10 @@ void signal_forwarder(int signum)
 {
     const int saved_errno = errno;
 
-    if (pid_compiler)
+    if (0 < pid_compiler)
         kill(pid_compiler, signum);
 
-    if (pid_analyzer)
+    if (0 < pid_analyzer)
         kill(pid_analyzer, signum);
 
     errno = saved_errno;
