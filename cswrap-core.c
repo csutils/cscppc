@@ -173,11 +173,15 @@ bool install_signal_forwarder(void)
 pid_t launch_tool(const char *tool, char **argv)
 {
     const pid_t pid = fork();
+    if (pid < 0)
+        fail("failed to fork() for '%s' (%s)", tool, strerror(errno));
+
     if (pid != 0)
         /* either fork() failure, or continuation of the parental process */
         return pid;
 
     execvp(tool, argv);
+    fail("failed to exec '%s' (%s)", tool, strerror(errno));
     exit((ENOENT == errno)
             ? /* command not found      */ 0x7F
             : /* command not executable */ 0x7E);
@@ -385,8 +389,6 @@ void consider_running_analyzer(const int argc_orig, char **const argv_orig)
 
     /* try to start analyzer */
     pid_analyzer = launch_tool(analyzer_name, argv);
-    if (pid_analyzer <= 0)
-        fail("failed to launch %s (%s)", analyzer_name, strerror(errno));
 
     /* FIXME: release also the memory allocated by asprintf() */
     free(argv);
@@ -419,7 +421,7 @@ int run_compiler_and_analyzer(const char *tool, const int argc, char **argv)
 
     pid_compiler = launch_tool(tool, argv);
     if (pid_compiler <= 0)
-        return fail("failed to launch %s (%s)", tool, strerror(errno));
+        return EXIT_FAILURE;
 
     consider_running_analyzer(argc, argv);
 
