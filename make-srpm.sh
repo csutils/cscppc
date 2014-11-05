@@ -155,6 +155,7 @@ done
 %files
 %{_bindir}/cscppc
 %{_datadir}/cscppc
+%{_datadir}/cscppc/default.supp
 %{_libdir}/cscppc
 %{_mandir}/man1/%{name}.1*
 %doc COPYING README

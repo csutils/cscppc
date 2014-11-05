@@ -43,6 +43,9 @@ add_executable(csclng csclng.c cswrap-core.c)
 add_executable(csclng++ ${CMAKE_CURRENT_BINARY_DIR}/csclng++.c cswrap-core.c)
 install(TARGETS cscppc csclng csclng++ DESTINATION bin)
 
+# install default.supp (suppression file for cppcheck)
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/default.supp DESTINATION share/cscppc)
+
 macro(add_man_page tool)
     add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${tool}.1
         COMMAND a2x -f manpage ${CMAKE_CURRENT_SOURCE_DIR}/${tool}.txt
