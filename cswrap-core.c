@@ -214,8 +214,25 @@ int wait_for(const pid_t pid)
         if (pid_analyzer == si.si_pid)
             pid_analyzer = 0;
 
-        if (pid == si.si_pid)
-            return si.si_status;
+        if (pid != si.si_pid)
+            continue;
+
+        switch (si.si_code) {
+            case CLD_STOPPED:
+            case CLD_CONTINUED:
+                /* not yet finished */
+                continue;
+
+            case CLD_KILLED:
+            case CLD_DUMPED:
+                /* terminated by a signal */
+                return 0x80 + si.si_status;
+
+            case CLD_EXITED:
+                /* terminated by a call to _exit() */
+            default:
+                return si.si_status;
+        }
     }
 }
 
