@@ -85,6 +85,10 @@ Source0:    https://git.fedorahosted.org/cgit/cscppc.git/snapshot/$SRC
 BuildRequires: asciidoc
 BuildRequires: cmake
 
+%ifarch %{ix86} x86_64
+BuildRequires: valgrind
+%endif
+
 # csmock copies the resulting cscppc binary into mock chroot, which may contain
 # an older (e.g. RHEL-5) version of glibc, and it would not dynamically link
 # against the old version of glibc if it was built against a newer one.

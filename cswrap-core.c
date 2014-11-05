@@ -293,9 +293,7 @@ int translate_args_for_analyzer(int argc, char **argv)
         if (is_def_inc(arg)) {
             if (is_bare_def_inc(arg))
                 /* bare -D or -I --> we need to take the next arg, too */
-                if (argc <= ++i)
-                    /* ... but there is not next arg --> bail out now! */
-                    break;
+                ++i;
 
             /* pass -D and -I flags directly */
             continue;
