@@ -14,8 +14,9 @@ done
 export PATH
 
 # create faked compilers and analyzers
-printf '#!/bin/sh\nprintf "%%s %%s\\n" "$(basename "$0")" "$*"\n' \
-    | tee tools/{cc,gcc,g++,cppcheck,clang{,++}}                    || exit $?
+printf '#!/bin/bash
+echo "$$" > "$(basename "$0").pid"
+' | tee tools/{cc,gcc,g++,cppcheck,clang{,++}}                      || exit $?
 chmod 0755 tools/{cc,gcc,g++,cppcheck,clang{,++}}                   || exit $?
 
 # create symlinks to wrappers
@@ -28,45 +29,48 @@ echo 'gcc "$@"' >> tools/g++                                        || exit $?
 echo 'cc "$@"'  >> tools/gcc                                        || exit $?
 
 look_for_tool() {
-    grep "^$1" "$2" > /dev/null
+    { test 0 -lt "$(<$1.pid)" ; } 2>/dev/null
 }
 
 all_compilers_in() {
-    look_for_tool "cc"  "$1" || return $?
-    look_for_tool "gcc" "$1" || return $?
-    look_for_tool "g++" "$1"
+    look_for_tool "cc"                  || return $?
+    look_for_tool "gcc"                 || return $?
+    look_for_tool "g++"                 || return $?
+    return 0
 }
 
 all_analyzers_in() {
-    look_for_tool "cppcheck" "$1" || return $?
-    look_for_tool "clang"    "$1" || return $?
-    look_for_tool "clang++"  "$1"
+    look_for_tool "cppcheck"            || return $?
+    look_for_tool "clang++"             || return $?
+    look_for_tool "clang"               || return $?
+    return 0
 }
 
 no_analyzers_in() {
-    look_for_tool "cppcheck" "$1" && return 1
-    look_for_tool "clang"    "$1" && return 1
-    look_for_tool "clang++"  "$1" && return 1
+    look_for_tool "cppcheck"            && return 1
+    look_for_tool "clang++"             && return 1
+    look_for_tool "clang"               && return 1
     return 0
 }
 
 single_check() {
     { set +x; } 2>/dev/null
-    trap "set -x" RETURN
+    trap "ls -l *.pid" EXIT
+    trap "trap EXIT; set -x" RETURN
     with_analyzers="$1"
     shift
-    g++ "$@" > output.txt               || exit $?
-    all_compilers_in output.txt         || exit $?
+    rm -f *.pid
+    g++ "$@"                            || exit $?
+    all_compilers_in                    || exit $?
     if test "yes" == "$with_analyzers"; then
         chk=all_analyzers_in
     else
         chk=no_analyzers_in
     fi
-    if "$chk" output.txt; then
+    if "$chk"; then
         return 0
     else
         set -x
-        cat output.txt
         exit 1
     fi
 }
