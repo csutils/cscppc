@@ -128,17 +128,10 @@ cd cscppc_build
 ctest %{?_smp_mflags} --output-on-failure
 
 %install
-install -m0755 -d \\
-    "\$RPM_BUILD_ROOT%{_bindir}"                \\
-    "\$RPM_BUILD_ROOT%{_datadir}"               \\
-    "\$RPM_BUILD_ROOT%{_datadir}/cscppc"        \\
-    "\$RPM_BUILD_ROOT%{_libdir}"                \\
-    "\$RPM_BUILD_ROOT%{_libdir}/cscppc"         \\
-    "\$RPM_BUILD_ROOT%{_libdir}/csclng"         \\
-    "\$RPM_BUILD_ROOT%{_mandir}/man1"
-
 cd cscppc_build
 make install DESTDIR="\$RPM_BUILD_ROOT"
+
+install -m0755 -d "\$RPM_BUILD_ROOT%{_libdir}"{,/cscppc,/csclng}
 
 for i in cc gcc %{_arch}-redhat-linux-gcc
 do
