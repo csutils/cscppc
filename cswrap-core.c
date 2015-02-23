@@ -380,9 +380,11 @@ void consider_running_analyzer(const int argc_orig, char **const argv_orig)
 
     /* translate cmd-line args for analyzer */
     const int argc_cmd = translate_args_for_analyzer(argc_orig, argv);
-    if (argc_cmd <= 0)
+    if (argc_cmd <= 0) {
         /* do not start analyzer */
+        free(argv);
         return;
+    }
 
     const int argc_total = argc_cmd + analyzer_def_argc;
     if (argc_orig < argc_total) {
