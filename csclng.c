@@ -39,6 +39,11 @@ const bool analyzer_is_gcc_compatible = true;
 
 static const char *analyzer_def_arg_list[] = {
     "--analyze",
+
+    /* write error traces to stderr instead of creating .plist files */
+    "-Xanalyzer",
+    "-analyzer-output=text",
+
     NULL
 };
 
