@@ -85,6 +85,12 @@ Source0:    https://git.fedorahosted.org/cgit/cscppc.git/snapshot/$SRC
 BuildRequires: asciidoc
 BuildRequires: cmake
 
+# The test-suite runs automatically trough valgrind if valgrind is available
+# on the system.  By not installing valgrind into mock's chroot, we disable
+# this feature for production builds on architectures where valgrind is known
+# to be less reliable, in order to avoid unnecessary build failures (see RHBZ
+# #810992, #816175, and #886891).  Nevertheless developers are free to install
+# valgrind manually to improve test coverage on any architecture.
 %ifarch %{ix86} x86_64
 BuildRequires: valgrind
 %endif
