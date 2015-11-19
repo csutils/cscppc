@@ -28,6 +28,8 @@ extern const char *wrapper_path;
 
 extern const char *wrapper_proc_prefix;
 
+extern const char *wrapper_addopts_envvar_name;
+
 extern const char *wrapper_debug_envvar_name;
 
 extern const char *analyzer_name;

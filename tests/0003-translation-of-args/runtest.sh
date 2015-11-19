@@ -99,3 +99,7 @@ single_check "clang++ clang" "-include cstddef x.cc -isystem /usr/local/include 
 
 # translating -include, -iquote, and -isystem for cppcheck
 single_check "cppcheck" "--include=cstddef x.cc -I/usr/local/include -I../.." "-include -isystem -iquote" -include cstddef x.cc -isystem /usr/local/include -iquote ../..
+
+# adding custom flags
+CSCLNG_ADD_OPTS="-Wall" CSCPPC_ADD_OPTS="--enable=all:--inconclusive" single_check "cppcheck"      "a.c --enable=all --inconclusive" "-Wall" a.c
+CSCLNG_ADD_OPTS="-Wall" CSCPPC_ADD_OPTS="--enable=all:--inconclusive" single_check "clang clang++" "a.c -Wall" "--enable=all --inconclusive" a.c

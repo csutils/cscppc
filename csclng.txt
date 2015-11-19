@@ -84,6 +84,12 @@ ENVIRONMENT VARIABLES
     If set to a non-empty string, csclng outputs the list of parameters given
     to clang to the standard output.
 
+*CSCLNG_ADD_OPTS*::
+    csclng expects a colon-separated list of Clang options that should be
+    appended to command line prior to invoking Clang.  The options are
+    appended even if they already appear in the command line and they are
+    always appended at the end of the command line.
+
 
 BUGS
 ----

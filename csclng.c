@@ -31,6 +31,8 @@ const char *wrapper_path = "";
 
 const char *wrapper_proc_prefix = "[csclng] ";
 
+const char *wrapper_addopts_envvar_name = "CSCLNG_ADD_OPTS";
+
 const char *wrapper_debug_envvar_name = "DEBUG_CSCLNG";
 
 const char *analyzer_name = "clang";

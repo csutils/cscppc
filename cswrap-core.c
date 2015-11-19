@@ -370,6 +370,46 @@ drop_it:
     return argc;
 }
 
+int num_custom_opts(const char *str)
+{
+    if (!str || !str[0])
+        return 0;
+
+    int num;
+    for (num = 1; NULL != (str = strchr(str, ':')); ++num)
+        ++str;
+
+    return num;
+}
+
+bool read_custom_opts(char **dst, const char *str)
+{
+    if (!str || !str[0])
+        return true;
+
+    /* go through all options separated by ':' */
+    for (;;) {
+        const char *term = strchr(str, ':');
+        if (!term)
+            /* this was the last option */
+            return (*dst = strdup(str));
+
+        /* allocate memory for the option in the dst array */
+        const size_t len = term - str;
+        *dst = malloc(len + /* for NUL */ 1);
+        if (!*dst)
+            return /* OOM */ false;
+
+        /* copy single option to the dst array */
+        memcpy(*dst, str, len);
+        (*dst)[len] = '\0';
+
+        /* move the cursor and jump to the next option */
+        ++dst;
+        str = term + 1;
+    }
+}
+
 void consider_running_analyzer(const int argc_orig, char **const argv_orig)
 {
     /* clone the argv array */
@@ -388,7 +428,11 @@ void consider_running_analyzer(const int argc_orig, char **const argv_orig)
         return;
     }
 
-    const int argc_total = argc_cmd + analyzer_def_argc;
+    /* count custom analyzer args (read from env var) */
+    const char *var_add_opts = getenv(wrapper_addopts_envvar_name);
+    const int argc_custom = num_custom_opts(var_add_opts);
+
+    const int argc_total = argc_cmd + analyzer_def_argc + argc_custom;
     if (argc_orig < argc_total) {
         /* enlarge the argv array */
         argv_size = (argc_total + 1) * sizeof(char *);
@@ -402,11 +446,21 @@ void consider_running_analyzer(const int argc_orig, char **const argv_orig)
     }
 
     /* append default analyzer args */
-    memcpy(argv + argc_cmd, analyzer_def_argv,
-            analyzer_def_argc * sizeof(char *));
+    char **argv_now = argv + argc_cmd;
+    memcpy(argv_now, analyzer_def_argv, analyzer_def_argc * sizeof(char *));
+    argv_now += analyzer_def_argc - /* terminating NULL */1;
+
+    /* append custom analyzer args (read from env var) if any */
+    if (!read_custom_opts(argv_now, var_add_opts)) {
+        free(argv);
+        return;
+    }
 
     /* make sure that the analyzer process is named analyzer_name */
     argv[0] = (char *) analyzer_name;
+
+    /* make sure there is NULL at the end of argv[] */
+    argv[argc_total - 1] = NULL;
 
     const char *var_debug = getenv(wrapper_debug_envvar_name);
     if (var_debug && *var_debug) {
@@ -421,7 +475,8 @@ void consider_running_analyzer(const int argc_orig, char **const argv_orig)
     /* try to start analyzer */
     pid_analyzer = launch_tool(analyzer_name, argv);
 
-    /* FIXME: release also the memory allocated by asprintf() */
+    /* FIXME: release also the memory allocated by asprintf() and
+       read_custom_opts() */
     free(argv);
 }
 

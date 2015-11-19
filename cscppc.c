@@ -32,6 +32,8 @@ const char *wrapper_path = "";
 
 const char *wrapper_proc_prefix = "[cscppc] ";
 
+const char *wrapper_addopts_envvar_name = "CSCPPC_ADD_OPTS";
+
 const char *wrapper_debug_envvar_name = "DEBUG_CSCPPC";
 
 const char *analyzer_name = "cppcheck";

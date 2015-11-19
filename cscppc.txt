@@ -96,6 +96,12 @@ ENVIRONMENT VARIABLES
     If set to a non-empty string, cscppc outputs the list of parameters given
     to cppcheck to the standard output.
 
+*CSCPPC_ADD_OPTS*::
+    cscppc expects a colon-separated list of Cppcheck options that should be
+    appended to command line prior to invoking Cppcheck.  The options are
+    appended even if they already appear in the command line and they are
+    always appended at the end of the command line.
+
 
 BUGS
 ----
