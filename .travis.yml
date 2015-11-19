@@ -14,19 +14,3 @@ install:
 script:
     - make -j9 distcheck CTEST='ctest -j9'
     - test -z "$TRAVIS_COMMIT_RANGE" || csbuild --git-commit-range "$TRAVIS_COMMIT_RANGE" -c "make distclean && make -j9" --git-bisect --print-current --print-fixed
-
-env:
-    global:
-        # The next declaration is the encrypted COVERITY_SCAN_TOKEN, created
-        #   via the "travis encrypt" command using the project repo's public key
-        - secure: "O4heprvls8zO86tcTHpFIPk92QibqxPrJoKvunMMKolzn/j96aVAoSd8kRvAmvY04PJM32QoeUOTKNblAX0xKOW6R23WbVIsSiLkmouELspd53hgJpxnXIR2L2YbgbfJZQTMLURrnD1IXU74n24bS6auEdSddtncJDOtH+fNjnU="
-
-addons:
-    coverity_scan:
-        project:
-            name: "kdudka/cscppc"
-            description: "A compiler wrapper that runs Cppcheck/Clang in background"
-        notification_email: kdudka@redhat.com
-        build_command_prepend: make distclean
-        build_command: make -j9
-        branch_pattern: master
