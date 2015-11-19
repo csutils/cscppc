@@ -73,7 +73,7 @@ single_check() {
         done
 
         for i in $without_args; do
-            lookup "$i" "${analyzer}-args.txt"                      && exit $?
+            lookup "$i" "${analyzer}-args.txt"                      && exit 1
             true
         done
     done
@@ -84,10 +84,11 @@ single_check "cppcheck"      "test.c --inline-suppr --quiet" "--analyze" test.c
 single_check "clang++ clang" "test.c --analyze" "--inline-suppr --quiet" test.c
 
 # dropping unrelated flags
-single_check "cppcheck clang++ clang" "a.c b.cc c.C d.cpp e.cxx" "-g -O0 --Wall -Wextra" -g a.c b.cc -O0 c.C d.cpp e.cxx --Wall -Wextra
+single_check "cppcheck"      "a.c b.cc c.C d.cpp e.cxx" "-g -O0 --Wall -Wextra" -g a.c b.cc -O0 c.C d.cpp e.cxx --Wall -Wextra
+single_check "clang clang++" "a.c b.cc -O0 c.C d.cpp e.cxx" "-g --Wall -Wextra" -g a.c b.cc -O0 c.C d.cpp e.cxx --Wall -Wextra
 
 # passing -D and -I to the analyzer
-single_check "cppcheck clang++ clang" "a.c -DTRACE -D SSLTRACE -I/usr/include-glib-2.0 -I /usr/include/nss3" "-O0 -Wall" a.c -g -DTRACE -D SSLTRACE -O0 -I/usr/include-glib-2.0 -I /usr/include/nss3 -Wall
+single_check "cppcheck clang++ clang" "a.c -DTRACE -D SSLTRACE -I/usr/include-glib-2.0 -I /usr/include/nss3" "-g -Wall" a.c -g -DTRACE -D SSLTRACE -O0 -I/usr/include-glib-2.0 -I /usr/include/nss3 -Wall
 
 # passing -m{16,32,64} and -std=... to clang
 single_check "clang++ clang" "-m16 -m32 -m64 a.c -std=gnu99" "-g" -m16 -m32 -m64 a.c -std=gnu99 -g
