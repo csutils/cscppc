@@ -208,6 +208,16 @@ int wait_for(const pid_t pid)
                 return fail("waitid() failed while waiting for %d: %s", pid,
                         strerror(errno));
 
+        switch (si.si_code) {
+            case CLD_STOPPED:
+            case CLD_CONTINUED:
+                /* not yet finished */
+                continue;
+
+            default:
+                break;
+        }
+
         if (pid_compiler == si.si_pid)
             pid_compiler = 0;
 
@@ -218,11 +228,6 @@ int wait_for(const pid_t pid)
             continue;
 
         switch (si.si_code) {
-            case CLD_STOPPED:
-            case CLD_CONTINUED:
-                /* not yet finished */
-                continue;
-
             case CLD_KILLED:
             case CLD_DUMPED:
                 /* terminated by a signal */
