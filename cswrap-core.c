@@ -37,7 +37,6 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
-#define STREQ(a, b) (!strcmp(a, b))
 #define MATCH_PREFIX(str, pref) (!strncmp(str, pref, sizeof(pref) - 1U))
 
 static volatile pid_t pid_compiler;
@@ -83,66 +82,6 @@ static int handle_args(const int argc, char *argv[])
     }
 
     return usage(argv);
-}
-
-bool remove_self_from_path(const char *tool, char *path)
-{
-    if (!path)
-        return false;
-
-    char *const path_orig = path;
-    bool found = false;
-
-    /* go through all paths in $PATH */
-    char *term = path;
-    while (term) {
-        term = strchr(path, ':');
-        if (term)
-            /* temporarily replace the separator by zero */
-            *term = '\0';
-
-        /* concatenate dirname and basename */
-        char *raw_path;
-        if (!path[0])
-            /* PATH="" is interpreted as PATH="." */
-            raw_path = strdup(tool);
-        else if (-1 == asprintf(&raw_path, "%s/%s", path, tool))
-            raw_path = NULL;
-        if (!raw_path)
-            /* OOM */
-            return false;
-
-        /* compare the canonicalized basename with wrapper_name */
-        char *exec_path = canonicalize_file_name(raw_path);
-        const bool self = exec_path && STREQ(wrapper_name, basename(exec_path));
-        free(exec_path);
-        free(raw_path);
-
-        if ((path_orig != path) && !path[0])
-            /* PATH=":foo" is interpreted as PATH=".:foo" */
-            --path;
-
-        /* jump to the next path in $PATH */
-        char *const next = (term)
-            ? (term + 1)
-            : (path + strlen(path));
-
-        if (self) {
-            /* remove self from $PATH */
-            memmove(path, next, 1U + strlen(next));
-            found = true;
-            continue;
-        }
-
-        if (term)
-            /* restore the original separator */
-            *term = ':';
-
-        /* move the cursor */
-        path = next;
-    }
-
-    return found;
 }
 
 void signal_forwarder(int signum)
@@ -531,7 +470,7 @@ int main(int argc, char *argv[])
 
     /* remove self from $PATH in order to avoid infinite recursion */
     char *path = getenv("PATH");
-    status = (remove_self_from_path(tool, path) && path[0])
+    status = (remove_self_from_path(tool, path, wrapper_name) && path[0])
         ? run_compiler_and_analyzer(tool, argc, argv)
         : fail("symlink '%s -> %s' not found in $PATH (%s)",
                 tool, wrapper_name, path);
