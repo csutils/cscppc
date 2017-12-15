@@ -38,9 +38,10 @@ add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/csclng++.c
 add_definitions(-iquote ${CMAKE_CURRENT_SOURCE_DIR})
 
 # compile and install executables
-add_executable(cscppc cscppc.c cswrap-core.c)
-add_executable(csclng csclng.c cswrap-core.c)
-add_executable(csclng++ ${CMAKE_CURRENT_BINARY_DIR}/csclng++.c cswrap-core.c)
+add_executable(cscppc cscppc.c cswrap-core.c cswrap/cswrap-util.c)
+add_executable(csclng csclng.c cswrap-core.c cswrap/cswrap-util.c)
+add_executable(csclng++ ${CMAKE_CURRENT_BINARY_DIR}/csclng++.c
+    cswrap-core.c cswrap/cswrap-util.c)
 install(TARGETS cscppc csclng csclng++ DESTINATION bin)
 
 # install default.supp (suppression file for cppcheck)

@@ -23,6 +23,7 @@
 #define _POSIX_C_SOURCE 200809L
 
 #include "cswrap-core.h"
+#include "cswrap/cswrap-util.h"
 
 #include <errno.h>
 #include <libgen.h>
@@ -485,26 +486,6 @@ void consider_running_analyzer(const int argc_orig, char **const argv_orig)
     free(argv);
 }
 
-/* FIXME: copy/pasted from cswrap */
-void tag_process_name(const int argc, char *argv[])
-{
-    const size_t prefix_len = strlen(wrapper_proc_prefix);
-
-    /* obtain bounds of the array pointed by argv[] */
-    char *beg = argv[0];
-    char *end = argv[argc - 1];
-    while (*end++)
-        ;
-    const size_t total = end - beg;
-    if (total <= prefix_len)
-        /* not enough space to insert the wrapper_proc_prefix */
-        return;
-
-    /* shift the contents by prefix_len to right and insert the prefix */
-    memmove(beg + prefix_len, beg, total - prefix_len - 1U);
-    memcpy(beg, wrapper_proc_prefix, prefix_len);
-}
-
 int run_compiler_and_analyzer(const char *tool, const int argc, char **argv)
 {
     if (!install_signal_forwarder())
@@ -516,7 +497,7 @@ int run_compiler_and_analyzer(const char *tool, const int argc, char **argv)
 
     consider_running_analyzer(argc, argv);
 
-    tag_process_name(argc, argv);
+    tag_process_name(wrapper_proc_prefix, argc, argv);
 
     const int status = wait_for(pid_compiler);
 

@@ -58,7 +58,8 @@ trap "echo --- $SELF: removing $TMP... 2>&1; rm -rf '$TMP'" EXIT
 cd "$TMP" >/dev/null || die "mktemp failed"
 
 # clone the repository
-git clone "$REPO" "$PKG"                || die "git clone failed"
+git clone --recurse-submodules "$REPO" "$PKG" \
+                                        || die "git clone failed"
 cd "$PKG"                               || die "git clone failed"
 
 make -j9 distcheck CTEST='ctest -j9'    || die "'make distcheck' has failed"
@@ -67,6 +68,11 @@ SRC_TAR="${NV}.tar"
 SRC="${SRC_TAR}.xz"
 git archive --prefix="$NV/" --format="tar" HEAD -- . > "${TMP}/${SRC_TAR}" \
                                         || die "failed to export sources"
+(cd cswrap && git archive --prefix="$NV/cswrap/" --format="tar" HEAD -- \
+    cswrap-util.{c,h} > ../cswrap-util.tar) \
+                                        || die "failed to export submodule"
+tar -Af "${TMP}/${SRC_TAR}" cswrap-util.tar \
+                                        || die "failed to concatenate TAR"
 cd "$TMP" >/dev/null                    || die "mktemp failed"
 xz -c "$SRC_TAR" > "$SRC"               || die "failed to compress sources"
 
