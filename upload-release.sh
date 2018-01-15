@@ -25,6 +25,10 @@ test -n "$TOKEN" || usage
 SRC_TAR="${NV}.tar"
 git archive --prefix="$NV/" --format="tar" HEAD -- . > "$SRC_TAR" \
                                         || die "failed to export sources"
+(cd cswrap && git archive --prefix="$NV/cswrap/" --format="tar" HEAD -- \
+    cswrap-util.{c,h} > ../cswrap-util.tar) \
+                                        || die "failed to export submodule"
+tar -Af "$SRC_TAR" cswrap-util.tar      || die "failed to concatenate TAR"
 
 # produce .tar.gz
 TAR_GZ="${NV}.tar.gz"
