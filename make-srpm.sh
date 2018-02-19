@@ -90,6 +90,7 @@ Source0:    https://github.com/kdudka/%{name}/releases/download/%{name}-%{versio
 
 BuildRequires: asciidoc
 BuildRequires: cmake
+BuildRequires: gcc
 
 # The test-suite runs automatically trough valgrind if valgrind is available
 # on the system.  By not installing valgrind into mock's chroot, we disable
