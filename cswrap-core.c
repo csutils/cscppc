@@ -215,6 +215,7 @@ bool is_black_listed_file(const char *name)
     return STREQ(name, "conftest.c")
         || STREQ(name, "../test.c")
         || STREQ(name, "_configtest.c")
+        || STREQ(name, "config-temp/qemu-conf.c")
         || strstr(name, "/CMakeTmp/");
 }
 
