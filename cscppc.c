@@ -52,6 +52,8 @@ static const char *analyzer_def_arg_list[] = {
 #else
 #error "Unknown word size"
 #endif
+    "-D_exit=exit",
+    "-Ddie=exit",
     "--inline-suppr",
     "--quiet",
     "--template={file}:{line}: {severity}: {id}: {message}",
