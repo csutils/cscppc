@@ -126,13 +126,24 @@ Conflicts: csmock-plugin-clang < 1.5.0
 This package contains the csclng compiler wrapper that runs the Clang analyzer
 in background fully transparently.
 
+%package -n csmatch
+Summary: A compiler wrapper that runs smatch in background
+Requires: clang
+
+%description -n csmatch
+This package contains the csmatch compiler wrapper that runs the smatch analyzer
+in background fully transparently.
+
 %prep
 %setup -q
 
 %build
 mkdir cscppc_build
 cd cscppc_build
-export CFLAGS="\$RPM_OPT_FLAGS"' -DPATH_TO_CSCPPC=\\"%{_libdir}/cscppc\\" -DPATH_TO_CSCLNG=\\"%{_libdir}/csclng\\"'
+export CFLAGS="\$RPM_OPT_FLAGS"
+CFLAGS="\$CFLAGS"' -DPATH_TO_CSCPPC=\\"%{_libdir}/cscppc\\"'
+CFLAGS="\$CFLAGS"' -DPATH_TO_CSCLNG=\\"%{_libdir}/csclng\\"'
+CFLAGS="\$CFLAGS"' -DPATH_TO_CSMATCH=\\"%{_libdir}/csmatch\\"'
 export LDFLAGS="\$RPM_OPT_FLAGS -static -pthread"
 %cmake ..
 make %{?_smp_mflags} VERBOSE=yes
@@ -145,12 +156,13 @@ ctest %{?_smp_mflags} --output-on-failure
 cd cscppc_build
 make install DESTDIR="\$RPM_BUILD_ROOT"
 
-install -m0755 -d "\$RPM_BUILD_ROOT%{_libdir}"{,/cscppc,/csclng}
+install -m0755 -d "\$RPM_BUILD_ROOT%{_libdir}"{,/cs{cppc,clng,match}}
 
 for i in cc gcc %{_arch}-redhat-linux-gcc
 do
     ln -s ../../bin/cscppc "\$RPM_BUILD_ROOT%{_libdir}/cscppc/\$i"
     ln -s ../../bin/csclng "\$RPM_BUILD_ROOT%{_libdir}/csclng/\$i"
+    ln -s ../../bin/csmatch "\$RPM_BUILD_ROOT%{_libdir}/csmatch/\$i"
 done
 
 for i in c++ g++ %{_arch}-redhat-linux-c++ %{_arch}-redhat-linux-g++
@@ -172,7 +184,12 @@ done
 %{_bindir}/csclng++
 %{_libdir}/csclng
 %{_mandir}/man1/csclng.1*
-%doc COPYING README
+%doc COPYING
+
+%files -n csmatch
+%{_bindir}/csmatch
+%{_libdir}/csmatch
+%doc COPYING
 EOF
 
 rpmbuild -bs "$SPEC"                            \
