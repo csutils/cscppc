@@ -37,6 +37,8 @@ const char *wrapper_debug_envvar_name = "DEBUG_CSCLNG";
 
 const char *analyzer_name = "clang";
 
+const bool analyzer_is_cxx_ready = true;
+
 const bool analyzer_is_gcc_compatible = true;
 
 static const char *analyzer_def_arg_list[] = {

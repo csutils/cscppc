@@ -203,8 +203,13 @@ bool is_bare_def_inc(const char *arg)
 
 bool is_input_file_suffix(const char *suffix)
 {
-    return STREQ(suffix, "c")
-        || STREQ(suffix, "C")
+    if (STREQ(suffix, "c"))
+        return true;
+
+    if (!analyzer_is_cxx_ready)
+        return false;
+
+    return STREQ(suffix, "C")
         || STREQ(suffix, "cc")
         || STREQ(suffix, "cpp")
         || STREQ(suffix, "cxx");

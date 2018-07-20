@@ -38,6 +38,8 @@ const char *wrapper_debug_envvar_name = "DEBUG_CSCPPC";
 
 const char *analyzer_name = "cppcheck";
 
+const bool analyzer_is_cxx_ready = true;
+
 const bool analyzer_is_gcc_compatible = false;
 
 static const char *analyzer_def_arg_list[] = {

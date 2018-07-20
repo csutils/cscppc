@@ -34,6 +34,8 @@ extern const char *wrapper_debug_envvar_name;
 
 extern const char *analyzer_name;
 
+extern const bool analyzer_is_cxx_ready;
+
 extern const bool analyzer_is_gcc_compatible;
 
 extern const char **analyzer_def_argv;
