@@ -221,7 +221,8 @@ bool is_black_listed_file(const char *name)
         || STREQ(name, "../test.c")
         || STREQ(name, "_configtest.c")
         || STREQ(name, "config-temp/qemu-conf.c")
-        || strstr(name, "/CMakeTmp/");
+        || strstr(name, "/CMakeTmp/")
+        || MATCH_PREFIX(name, "/tmp/cov-mockbuild/");
 }
 
 bool is_input_file(const char *arg)
