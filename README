@@ -9,3 +9,13 @@ can find the up2date sources in the following repository:
 
 cscppc is licensed under GPLv3+, see COPYING for details.  Please report bugs
 and feature requests on GitHub using the above URL.
+
+
+csclng
+------
+csclng is a compiler wrapper that runs the Clang analyzer in background.
+
+
+csmatch
+-------
+csmatch is an experimental compiler wrapper that runs smatch in background.

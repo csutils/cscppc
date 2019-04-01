@@ -22,6 +22,8 @@ The following parameters are given to clang by default:
 
     * --analyze
 
+    * -Xanalyzer -analyzer-output=text
+
 The following parameters are passed to clang from compiler's command line:
 
     * -D...
