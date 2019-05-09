@@ -37,8 +37,6 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
-#define MATCH_PREFIX(str, pref) (!strncmp(str, pref, sizeof(pref) - 1U))
-
 static volatile pid_t pid_compiler;
 static volatile pid_t pid_analyzer;
 
@@ -213,16 +211,6 @@ bool is_input_file_suffix(const char *suffix)
         || STREQ(suffix, "cc")
         || STREQ(suffix, "cpp")
         || STREQ(suffix, "cxx");
-}
-
-bool is_black_listed_file(const char *name)
-{
-    return STREQ(name, "conftest.c")
-        || STREQ(name, "../test.c")
-        || STREQ(name, "_configtest.c")
-        || STREQ(name, "config-temp/qemu-conf.c")
-        || strstr(name, "/CMakeTmp/")
-        || MATCH_PREFIX(name, "/tmp/cov-mockbuild/");
 }
 
 bool is_input_file(const char *arg)

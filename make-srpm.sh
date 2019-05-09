@@ -54,7 +54,7 @@ NV="${PKG}-${VER}"
 printf "%s: preparing a release of \033[1;32m%s\033[0m\n" "$SELF" "$NV"
 
 TMP="`mktemp -d`"
-trap "echo --- $SELF: removing $TMP... 2>&1; rm -rf '$TMP'" EXIT
+trap "rm -rf '$TMP'" EXIT
 cd "$TMP" >/dev/null || die "mktemp failed"
 
 # clone the repository
