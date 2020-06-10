@@ -68,6 +68,16 @@ The following path substrings are black-listed from being scanned by cppcheck:
 
     * ../test.c
 
+    * ../../test.c
+
+    * config-temp/qemu-conf.c
+
+    * scripts/kconfig/conf.c
+
+    * scripts/kconfig/zconf.tab.c
+
+    * /tmp/cov-mockbuild/
+
 If cscppc is installed on system, the following command activates the wrapper:
 -------------------------------------------------
 export PATH="`cscppc --print-path-to-wrap`:$PATH"

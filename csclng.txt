@@ -36,6 +36,18 @@ The following parameters are passed to clang from compiler's command line:
 
     * -isystem ...
 
+    * -m16
+
+    * -m32
+
+    * -m64
+
+    * -fno-exceptions
+
+    * -O...
+
+    * -std...
+
 The following file extensions are recognized as C/C++ source files:
 
     * c
@@ -57,6 +69,16 @@ The following path substrings are black-listed from being scanned by clang:
     * /CMakeTmp/
 
     * ../test.c
+
+    * ../../test.c
+
+    * config-temp/qemu-conf.c
+
+    * scripts/kconfig/conf.c
+
+    * scripts/kconfig/zconf.tab.c
+
+    * /tmp/cov-mockbuild/
 
 If csclng is installed on system, the following command activates the wrapper:
 -------------------------------------------------
