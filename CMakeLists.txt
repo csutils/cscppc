@@ -40,10 +40,11 @@ add_definitions(-iquote ${CMAKE_CURRENT_SOURCE_DIR})
 # compile and install executables
 add_executable(cscppc cscppc.c cswrap-core.c cswrap/cswrap-util.c)
 add_executable(csclng csclng.c cswrap-core.c cswrap/cswrap-util.c)
+add_executable(csgcca csgcca.c cswrap-core.c cswrap/cswrap-util.c)
 add_executable(csclng++ ${CMAKE_CURRENT_BINARY_DIR}/csclng++.c
     cswrap-core.c cswrap/cswrap-util.c)
 add_executable(csmatch csmatch.c cswrap-core.c cswrap/cswrap-util.c)
-install(TARGETS cscppc csclng csclng++ csmatch DESTINATION bin)
+install(TARGETS cscppc csclng csclng++ csgcca csmatch DESTINATION bin)
 
 # install default.supp (suppression file for cppcheck)
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/default.supp DESTINATION share/cscppc)
