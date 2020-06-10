@@ -56,12 +56,17 @@ static int fail(const char *fmt, ...)
 
 static int usage(char *argv[])
 {
+    /* FIXME: move this to the internal API */
+    const char *tool_name = (STREQ(analyzer_name, "gcc"))
+        ? "gcc -fanalyzer"
+        : analyzer_name;
+
     fprintf(stderr, "Usage:\n\
     export PATH=\"`%s --print-path-to-wrap`:$PATH\"\n\n\
-    %s is a compiler wrapper that runs %s in background.  Create a\n\
-    symbolic link to %s named as your compiler (gcc, g++, ...) and put it\n\
+    %s is a compiler wrapper that runs %s in background.  Create\n\
+    a symbolic link to %s named as your compiler (gcc, g++, ...) and put it\n\
     to your $PATH.  %s --help prints this text to standard error output.\n",
-    wrapper_name, wrapper_name, analyzer_name, wrapper_name, wrapper_name);
+    wrapper_name, wrapper_name, tool_name, wrapper_name, wrapper_name);
 
     for (; *argv; ++argv)
         if (STREQ("--help", *argv))
