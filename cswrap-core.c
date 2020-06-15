@@ -447,9 +447,33 @@ int run_compiler_and_analyzer(const char *tool, const int argc, char **argv)
     return status;
 }
 
+static bool sanitize_path(const char *tool, const char *arg0)
+{
+    /* remove self from $PATH in order to avoid infinite recursion */
+    char *path = getenv("PATH");
+    if (remove_self_from_path(tool, path, wrapper_name) && path[0])
+        return true;
+
+    /* symlink not found in $PATH ... are we invoked by its absolute path? */
+    if (arg0[0] == '/') {
+        /* compare final targets of /proc/self/exe and argv[0] */
+        char *const self = canonicalize_file_name("/proc/self/exe");
+        char *const link = canonicalize_file_name(arg0);
+        const bool match = self && link && STREQ(self, link);
+        free(link);
+        free(self);
+        if (match)
+            return true;
+    }
+
+    /* we are being invoked in an unsupported way */
+    fail("symlink '%s -> %s' not found in $PATH (%s)",
+            tool, wrapper_name, path);
+    return false;
+}
+
 int main(int argc, char *argv[])
 {
-    int status;
     if (argc < 1)
         return fail("argc < 1");
 
@@ -464,11 +488,9 @@ int main(int argc, char *argv[])
         return fail("strdup() failed");
 
     /* remove self from $PATH in order to avoid infinite recursion */
-    char *path = getenv("PATH");
-    status = (remove_self_from_path(tool, path, wrapper_name) && path[0])
+    const int status = (sanitize_path(tool, argv[0]))
         ? run_compiler_and_analyzer(tool, argc, argv)
-        : fail("symlink '%s -> %s' not found in $PATH (%s)",
-                tool, wrapper_name, path);
+        : EXIT_FAILURE;
 
     free(tool);
     return status;
