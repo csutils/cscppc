@@ -153,7 +153,7 @@ CFLAGS="\$CFLAGS"' -DPATH_TO_CSCLNG=\\"%{_libdir}/csclng\\"'
 CFLAGS="\$CFLAGS"' -DPATH_TO_CSGCCA=\\"%{_libdir}/csgcca\\"'
 CFLAGS="\$CFLAGS"' -DPATH_TO_CSMATCH=\\"%{_libdir}/csmatch\\"'
 export LDFLAGS="\$RPM_OPT_FLAGS -static -pthread"
-%cmake ..
+%cmake .. -B.
 make %{?_smp_mflags} VERBOSE=yes
 
 %check
