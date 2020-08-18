@@ -110,8 +110,11 @@ BuildRequires: valgrind
 BuildRequires: glibc-static
 %endif
 
-# the --include option was introduced in 1.58
-Requires: cppcheck >= 1.58
+# the {cwe} field in --template option is supported since cppcheck-1.85
+Requires: cppcheck >= 1.85
+
+# older versions of csdiff do not read CWE numbers from Cppcheck output
+Conflicts: csdiff < 1.8.0
 
 %description
 This package contains the cscppc compiler wrapper that runs cppcheck in

@@ -56,7 +56,7 @@ static const char *analyzer_def_arg_list[] = {
 #endif
     "--inline-suppr",
     "--quiet",
-    "--template={file}:{line}: {severity}: {id}: {message}",
+    "--template={file}:{line}: {severity}: {id}(CWE-{cwe}): {message}",
     "--suppressions-list=/usr/share/cscppc/default.supp",
     NULL
 };
