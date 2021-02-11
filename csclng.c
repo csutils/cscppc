@@ -47,6 +47,7 @@ static const char *analyzer_def_arg_list[] = {
     /* write error traces to stderr instead of creating .plist files */
     "-Xanalyzer",
     "-analyzer-output=text",
+    "-fno-caret-diagnostics",
 
     NULL
 };
