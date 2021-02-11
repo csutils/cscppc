@@ -44,6 +44,7 @@ const bool analyzer_is_gcc_compatible = true;
 static const char *analyzer_def_arg_list[] = {
     "-fanalyzer",
     "-fdiagnostics-path-format=separate-events",
+    "-fno-diagnostics-show-caret",
 
     /* do not create any object files, only emit diagnostic messages */
     "-c",
