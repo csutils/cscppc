@@ -59,3 +59,12 @@ const char **analyzer_def_argv = analyzer_def_arg_list;
 const int analyzer_def_argc =
     sizeof(analyzer_def_arg_list)/
     sizeof(analyzer_def_arg_list[0]);
+
+static const char *compiler_del_arg_list[] = {
+    /* we run `gcc -fanalyzer` in a separate process --> do not use the flag
+     * while compiling production binaries */
+    "-fanalyzer",
+    NULL
+};
+
+const char **compiler_del_args = compiler_del_arg_list;

@@ -57,3 +57,5 @@ const char **analyzer_def_argv = analyzer_def_arg_list;
 const int analyzer_def_argc =
     sizeof(analyzer_def_arg_list)/
     sizeof(analyzer_def_arg_list[0]);
+
+const char **compiler_del_args;

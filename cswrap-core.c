@@ -125,7 +125,26 @@ bool install_signal_forwarder(void)
     return true;
 }
 
-pid_t launch_tool(const char *tool, char **argv)
+static void apply_del_arg(char **argv, const char *del_arg)
+{
+    for (;;) {
+        const char *arg_now = *argv;
+        if (!arg_now)
+            /* end of argv[] */
+            return;
+
+        if (STREQ(arg_now, del_arg)) {
+            /* remove a signle occurence of del_arg in argv[] */
+            del_arg_from_argv(argv);
+            continue;
+        }
+
+        /* not an arg we are interested in */
+        ++argv;
+    }
+}
+
+pid_t launch_tool(const char *tool, char **argv, const char **del_args)
 {
     const pid_t pid = fork();
     if (pid < 0)
@@ -134,6 +153,13 @@ pid_t launch_tool(const char *tool, char **argv)
     if (pid != 0)
         /* either fork() failure, or continuation of the parental process */
         return pid;
+
+    if (del_args) {
+        /* remove del_args from argv for this invocation only */
+        const char *del_arg_now;
+        while (del_arg_now = *del_args++)
+            apply_del_arg(argv, del_arg_now);
+    }
 
     execvp(tool, argv);
     fail("failed to exec '%s' (%s)", tool, strerror(errno));
@@ -418,7 +444,7 @@ void consider_running_analyzer(const int argc_orig, char **const argv_orig)
     }
 
     /* try to start analyzer */
-    pid_analyzer = launch_tool(analyzer_name, argv);
+    pid_analyzer = launch_tool(analyzer_name, argv, /* del_args */ NULL);
 
     /* FIXME: release also the memory allocated by asprintf() and
        read_custom_opts() */
@@ -430,7 +456,7 @@ int run_compiler_and_analyzer(const char *tool, const int argc, char **argv)
     if (!install_signal_forwarder())
         return fail("unable to install signal forwarder");
 
-    pid_compiler = launch_tool(tool, argv);
+    pid_compiler = launch_tool(tool, argv, compiler_del_args);
     if (pid_compiler <= 0)
         return EXIT_FAILURE;
 

@@ -42,4 +42,6 @@ extern const char **analyzer_def_argv;
 
 extern const int analyzer_def_argc;
 
+extern const char **compiler_del_args;
+
 #endif /* CSWRAP_CORE_H */
