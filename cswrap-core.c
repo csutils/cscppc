@@ -157,7 +157,7 @@ pid_t launch_tool(const char *tool, char **argv, const char **del_args)
     if (del_args) {
         /* remove del_args from argv for this invocation only */
         const char *del_arg_now;
-        while (del_arg_now = *del_args++)
+        while ((del_arg_now = *del_args++))
             apply_del_arg(argv, del_arg_now);
     }
 
