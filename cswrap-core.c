@@ -288,8 +288,8 @@ int translate_args_for_analyzer(int argc, char **argv)
         }
 
         if (is_input_file(arg)) {
-            if (is_black_listed_file(arg))
-                /* black-listed input file --> do not start analyzer */
+            if (is_ignored_file(arg))
+                /* ignored input file --> do not start analyzer */
                 return -1;
 
             /* pass input file name as it is */
