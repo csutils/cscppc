@@ -1,6 +1,12 @@
 language: c
 compiler: gcc
 
+install:
+    - sudo apt-get install cmake valgrind
+
+script:
+    - make distcheck
+
 matrix:
     include:
         - name: "Ubuntu LTS 2014 (trusty)"
@@ -14,9 +20,6 @@ matrix:
 
         - name: "Ubuntu LTS 2020 (focal)"
           dist: focal
-
-install:
-    - sudo apt-get install cmake valgrind
-
-script:
-    - make distcheck
+          # work around broken Ubuntu repos (libc6-dbg does not match libc6 version)
+          install:
+            - sudo apt-get install cmake
