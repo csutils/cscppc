@@ -1,0 +1,36 @@
+# Copyright (C) 2014 - 2021 Red Hat, Inc.
+#
+# This file is part of cscppc.
+#
+# cscppc is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# any later version.
+#
+# cscppc is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with cscppc.  If not, see <http://www.gnu.org/licenses/>.
+
+macro(add_man_page tool)
+    add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${tool}.1
+        COMMAND a2x -f manpage ${CMAKE_CURRENT_SOURCE_DIR}/${tool}.adoc
+        -D ${CMAKE_CURRENT_BINARY_DIR}
+        DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${tool}.adoc
+        COMMENT "Generating ${tool}.1 man page...")
+    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${tool}.1
+        DESTINATION share/man/man1)
+endmacro()
+
+# build and install man pages (if asciidoc is available)
+find_program(A2X a2x)
+if(A2X)
+    add_man_page(csclng)
+    add_man_page(cscppc)
+    add_custom_target(doc ALL DEPENDS
+        ${CMAKE_CURRENT_BINARY_DIR}/csclng.1
+        ${CMAKE_CURRENT_BINARY_DIR}/cscppc.1)
+endif()

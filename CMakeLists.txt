@@ -1,4 +1,4 @@
-# Copyright (C) 2014 Red Hat, Inc.
+# Copyright (C) 2014 - 2021 Red Hat, Inc.
 #
 # This file is part of cscppc.
 #
@@ -49,25 +49,8 @@ install(TARGETS cscppc csclng csclng++ csgcca csmatch DESTINATION bin)
 # install default.supp (suppression file for cppcheck)
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/default.supp DESTINATION share/cscppc)
 
-macro(add_man_page tool)
-    add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${tool}.1
-        COMMAND a2x -f manpage ${CMAKE_CURRENT_SOURCE_DIR}/${tool}.txt
-        -D ${CMAKE_CURRENT_BINARY_DIR}
-        DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${tool}.txt
-        COMMENT "Generating ${tool}.1 man page...")
-    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${tool}.1
-        DESTINATION share/man/man1)
-endmacro()
-
 # build and install man pages (if asciidoc is available)
-find_program(A2X a2x)
-if(A2X)
-    add_man_page(csclng)
-    add_man_page(cscppc)
-    add_custom_target(doc ALL DEPENDS
-        ${CMAKE_CURRENT_BINARY_DIR}/csclng.1
-        ${CMAKE_CURRENT_BINARY_DIR}/cscppc.1)
-endif()
+add_subdirectory(doc)
 
 # run test-cases
 file(GLOB runtests "${CMAKE_CURRENT_SOURCE_DIR}/tests/*/runtest.sh")
