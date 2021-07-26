@@ -46,8 +46,8 @@ add_executable(csclng++ ${CMAKE_CURRENT_BINARY_DIR}/csclng++.c
 add_executable(csmatch csmatch.c cswrap-core.c cswrap/cswrap-util.c)
 install(TARGETS cscppc csclng csclng++ csgcca csmatch DESTINATION bin)
 
-# install default.supp (suppression file for cppcheck)
-install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/default.supp DESTINATION share/cscppc)
+# install data files
+add_subdirectory(data)
 
 # build and install man pages (if asciidoc is available)
 add_subdirectory(doc)
