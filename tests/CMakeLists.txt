@@ -24,5 +24,5 @@ foreach(runtest ${runtests})
     # for each of them run: runtest.sh PATH_TO_CSWRAP TEST_DST_DIR TEST_SRC_DIR
     add_test("${test_name}" "${runtest}" "${test_src_dir}"
         "${CMAKE_CURRENT_BINARY_DIR}/${test_name}/"
-        "${CMAKE_BINARY_DIR}")
+        "${CMAKE_BINARY_DIR}/src")
 endforeach()

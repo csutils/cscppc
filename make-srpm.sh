@@ -69,7 +69,7 @@ SRC="${SRC_TAR}.xz"
 git archive --prefix="$NV/" --format="tar" HEAD -- . > "${TMP}/${SRC_TAR}" \
                                         || die "failed to export sources"
 (cd cswrap && git archive --prefix="$NV/cswrap/" --format="tar" HEAD -- \
-    cswrap-util.{c,h} > ../cswrap-util.tar) \
+    src/cswrap-util.{c,h} > ../cswrap-util.tar) \
                                         || die "failed to export submodule"
 tar -Af "${TMP}/${SRC_TAR}" cswrap-util.tar \
                                         || die "failed to concatenate TAR"

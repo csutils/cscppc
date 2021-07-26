@@ -19,32 +19,8 @@ cmake_minimum_required(VERSION 2.8.12)
 project(cscppc C)
 enable_testing()
 
-# make sure that waitid() is available
-include(CheckFunctionExists)
-check_function_exists(waitid HAVE_WAITID_FUNCTION)
-if(HAVE_WAITID_FUNCTION)
-else()
-    message(FATAL_ERROR "
-required waitid() function not found")
-endif()
-
-# create csclng++.c from csclng.c
-add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/csclng++.c
-    COMMAND sed -e 's/csclng/csclng++/g' -e 's/clang/clang++/g'
-    ${CMAKE_CURRENT_SOURCE_DIR}/csclng.c >
-    ${CMAKE_CURRENT_BINARY_DIR}/csclng++.c
-    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/csclng.c
-    COMMENT "Generating csclng++.c source file...")
-add_definitions(-iquote ${CMAKE_CURRENT_SOURCE_DIR})
-
-# compile and install executables
-add_executable(cscppc cscppc.c cswrap-core.c cswrap/cswrap-util.c)
-add_executable(csclng csclng.c cswrap-core.c cswrap/cswrap-util.c)
-add_executable(csgcca csgcca.c cswrap-core.c cswrap/cswrap-util.c)
-add_executable(csclng++ ${CMAKE_CURRENT_BINARY_DIR}/csclng++.c
-    cswrap-core.c cswrap/cswrap-util.c)
-add_executable(csmatch csmatch.c cswrap-core.c cswrap/cswrap-util.c)
-install(TARGETS cscppc csclng csclng++ csgcca csmatch DESTINATION bin)
+# build source code
+add_subdirectory(src)
 
 # install data files
 add_subdirectory(data)

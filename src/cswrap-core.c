@@ -23,7 +23,7 @@
 #define _POSIX_C_SOURCE 200809L
 
 #include "cswrap-core.h"
-#include "cswrap/cswrap-util.h"
+#include "cswrap/src/cswrap-util.h"
 
 #include <errno.h>
 #include <libgen.h>
