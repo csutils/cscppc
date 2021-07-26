@@ -1,4 +1,4 @@
-#/bin/bash
+#!/bin/bash
 
 # Copyright (C) 2012-2013 Red Hat, Inc.
 #
@@ -62,7 +62,7 @@ git clone --recurse-submodules "$REPO" "$PKG" \
                                         || die "git clone failed"
 cd "$PKG"                               || die "git clone failed"
 
-make -j9 distcheck CTEST='ctest -j9'    || die "'make distcheck' has failed"
+make distcheck                          || die "'make distcheck' has failed"
 
 SRC_TAR="${NV}.tar"
 SRC="${SRC_TAR}.xz"

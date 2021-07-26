@@ -15,15 +15,17 @@
 # You should have received a copy of the GNU General Public License
 # along with cscppc.  If not, see <http://www.gnu.org/licenses/>.
 
+NUM_CPU ?= $(shell getconf _NPROCESSORS_ONLN 2>/dev/null || echo 1)
+
 CMAKE ?= cmake
-CTEST ?= ctest
+CTEST ?= ctest -j$(NUM_CPU)
 
 .PHONY: all check clean distclean distcheck install
 
 all:
 	mkdir -p cscppc_build
 	cd cscppc_build && $(CMAKE) ..
-	$(MAKE) -C cscppc_build
+	$(MAKE) -C cscppc_build -j$(NUM_CPU)
 
 check: all
 	cd cscppc_build && $(CTEST) --output-on-failure
