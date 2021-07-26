@@ -25,7 +25,7 @@ CTEST ?= ctest -j$(NUM_CPU)
 all:
 	mkdir -p cscppc_build
 	cd cscppc_build && $(CMAKE) ..
-	$(MAKE) -C cscppc_build -j$(NUM_CPU)
+	$(MAKE) -sC cscppc_build -j$(NUM_CPU)
 
 check: all
 	cd cscppc_build && $(CTEST) --output-on-failure
@@ -37,7 +37,7 @@ distclean:
 	rm -rf cscppc_build
 
 distcheck: distclean
-	$(MAKE) check
+	$(MAKE) -s check
 
 install: all
 	$(MAKE) -C cscppc_build install
