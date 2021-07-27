@@ -34,11 +34,14 @@ add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/csclng++.c
 add_definitions(-iquote ${CMAKE_CURRENT_SOURCE_DIR})
 add_definitions(-iquote ${CMAKE_SOURCE_DIR})
 
+# compile the common code base only once (as a static library)
+add_library(cswrap STATIC cswrap-core.c ../cswrap/src/cswrap-util.c)
+link_libraries(cswrap)
+
 # compile and install executables
-add_executable(cscppc cscppc.c cswrap-core.c ../cswrap/src/cswrap-util.c)
-add_executable(csclng csclng.c cswrap-core.c ../cswrap/src/cswrap-util.c)
-add_executable(csgcca csgcca.c cswrap-core.c ../cswrap/src/cswrap-util.c)
-add_executable(csclng++ ${CMAKE_CURRENT_BINARY_DIR}/csclng++.c
-    cswrap-core.c ../cswrap/src/cswrap-util.c)
-add_executable(csmatch csmatch.c cswrap-core.c ../cswrap/src/cswrap-util.c)
+add_executable(cscppc cscppc.c)
+add_executable(csclng csclng.c)
+add_executable(csclng++ ${CMAKE_CURRENT_BINARY_DIR}/csclng++.c)
+add_executable(csgcca csgcca.c)
+add_executable(csmatch csmatch.c)
 install(TARGETS cscppc csclng csclng++ csgcca csmatch DESTINATION bin)
