@@ -299,6 +299,7 @@ int translate_args_for_analyzer(int argc, char **argv)
 
         if (analyzer_is_gcc_compatible) {
             if (STREQ(arg, "-m16") || STREQ(arg, "-m32") || STREQ(arg, "-m64")
+                    || STREQ(arg, "-fexceptions")
                     || STREQ(arg, "-fno-exceptions")
                     || MATCH_PREFIX(arg, "-O")
                     || MATCH_PREFIX(arg, "-std"))
