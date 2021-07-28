@@ -87,7 +87,7 @@ static int handle_args(const int argc, char *argv[])
     return usage(argv);
 }
 
-void signal_forwarder(int signum)
+static void signal_forwarder(int signum)
 {
     const int saved_errno = errno;
 
@@ -100,29 +100,16 @@ void signal_forwarder(int signum)
     errno = saved_errno;
 }
 
-bool install_signal_forwarder(void)
+static bool install_signal_forwarder(void)
 {
     static int forwarded_signals[] = {
         SIGINT,
         SIGQUIT,
-        SIGTERM
+        SIGTERM,
+        /* list terminator */ 0
     };
 
-    static int forwarded_signals_cnt =
-        sizeof(forwarded_signals)/
-        sizeof(forwarded_signals[0]);
-
-    static const struct sigaction sa = {
-        .sa_handler = signal_forwarder
-    };
-
-    /* install the handler for all forwarded signals */
-    int i;
-    for (i = 0; i < forwarded_signals_cnt; ++i)
-        if (0 != sigaction(forwarded_signals[i], &sa, NULL))
-            return false;
-
-    return true;
+    return install_signal_handler(signal_forwarder, forwarded_signals);
 }
 
 static void apply_del_arg(char **argv, const char *del_arg)
@@ -230,34 +217,6 @@ bool is_bare_def_inc(const char *arg)
                     || STREQ(arg, "-isystem")));
 }
 
-bool is_input_file_suffix(const char *suffix)
-{
-    if (STREQ(suffix, "c"))
-        return true;
-
-    if (!analyzer_is_cxx_ready)
-        return false;
-
-    return STREQ(suffix, "C")
-        || STREQ(suffix, "cc")
-        || STREQ(suffix, "cpp")
-        || STREQ(suffix, "cxx");
-}
-
-bool is_input_file(const char *arg)
-{
-    const char *suffix = strrchr(arg, '.');
-    if (!suffix)
-        /* we require the file name to contain at least one dot */
-        return false;
-
-    /* skip behind the dot */
-    ++suffix;
-
-    /* check for a known input file suffix */
-    return is_input_file_suffix(suffix);
-}
-
 int /* args remain */ drop_arg(int *pargc, char **argv, const int i)
 {
     const int argc = --(*pargc);
@@ -287,7 +246,7 @@ int translate_args_for_analyzer(int argc, char **argv)
             continue;
         }
 
-        if (is_input_file(arg)) {
+        if (is_input_file(arg, analyzer_is_cxx_ready)) {
             if (is_ignored_file(arg))
                 /* ignored input file --> do not start analyzer */
                 return -1;
