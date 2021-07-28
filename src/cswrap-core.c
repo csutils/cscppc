@@ -131,7 +131,7 @@ static void apply_del_arg(char **argv, const char *del_arg)
     }
 }
 
-pid_t launch_tool(const char *tool, char **argv, const char **del_args)
+static pid_t launch_tool(const char *tool, char **argv, const char **del_args)
 {
     const pid_t pid = fork();
     if (pid < 0)
@@ -155,7 +155,7 @@ pid_t launch_tool(const char *tool, char **argv, const char **del_args)
             : /* command not executable */ 0x7E);
 }
 
-int wait_for(const pid_t pid)
+static int wait_for(const pid_t pid)
 {
     for (;;) {
         siginfo_t si;
@@ -197,7 +197,7 @@ int wait_for(const pid_t pid)
     }
 }
 
-bool is_def_inc(const char *arg)
+static bool is_def_inc(const char *arg)
 {
     return MATCH_PREFIX(arg, "-D")
         || MATCH_PREFIX(arg, "-I")
@@ -207,7 +207,7 @@ bool is_def_inc(const char *arg)
                     || STREQ(arg, "-isystem")));
 }
 
-bool is_bare_def_inc(const char *arg)
+static bool is_bare_def_inc(const char *arg)
 {
     return STREQ(arg, "-D")
         || STREQ(arg, "-I")
@@ -217,7 +217,7 @@ bool is_bare_def_inc(const char *arg)
                     || STREQ(arg, "-isystem")));
 }
 
-int /* args remain */ drop_arg(int *pargc, char **argv, const int i)
+static int /* args remain */ drop_arg(int *pargc, char **argv, const int i)
 {
     const int argc = --(*pargc);
     const int args_remain = argc - i;
@@ -226,7 +226,7 @@ int /* args remain */ drop_arg(int *pargc, char **argv, const int i)
     return args_remain;
 }
 
-int translate_args_for_analyzer(int argc, char **argv)
+static int translate_args_for_analyzer(int argc, char **argv)
 {
     int cnt_files = 0;
 
@@ -301,7 +301,7 @@ drop_it:
     return argc;
 }
 
-int num_custom_opts(const char *str)
+static int num_custom_opts(const char *str)
 {
     if (!str || !str[0])
         return 0;
@@ -313,7 +313,7 @@ int num_custom_opts(const char *str)
     return num;
 }
 
-bool read_custom_opts(char **dst, const char *str)
+static bool read_custom_opts(char **dst, const char *str)
 {
     if (!str || !str[0])
         return true;
@@ -341,7 +341,9 @@ bool read_custom_opts(char **dst, const char *str)
     }
 }
 
-void consider_running_analyzer(const int argc_orig, char **const argv_orig)
+static void consider_running_analyzer(
+        const int                   argc_orig,
+        char **const                argv_orig)
 {
     /* clone the argv array */
     size_t argv_size = (argc_orig + 1) * sizeof(char *);
@@ -411,7 +413,10 @@ void consider_running_analyzer(const int argc_orig, char **const argv_orig)
     free(argv);
 }
 
-int run_compiler_and_analyzer(const char *tool, const int argc, char **argv)
+static int run_compiler_and_analyzer(
+        const char                 *tool,
+        const int                   argc,
+        char                      **argv)
 {
     if (!install_signal_forwarder())
         return fail("unable to install signal forwarder");
