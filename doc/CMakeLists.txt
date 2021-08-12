@@ -21,6 +21,7 @@ macro(add_man_page tool)
         -D ${CMAKE_CURRENT_BINARY_DIR}
         DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${tool}.adoc
         COMMENT "Generating ${tool}.1 man page...")
+    set(man_pages ${man_pages} ${CMAKE_CURRENT_BINARY_DIR}/${tool}.1)
     install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${tool}.1
         DESTINATION share/man/man1)
 endmacro()
@@ -30,7 +31,6 @@ find_program(A2X a2x)
 if(A2X)
     add_man_page(csclng)
     add_man_page(cscppc)
-    add_custom_target(doc ALL DEPENDS
-        ${CMAKE_CURRENT_BINARY_DIR}/csclng.1
-        ${CMAKE_CURRENT_BINARY_DIR}/cscppc.1)
+    add_man_page(csgcca)
+    add_custom_target(doc ALL DEPENDS ${man_pages})
 endif()

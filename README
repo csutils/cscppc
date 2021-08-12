@@ -16,6 +16,11 @@ csclng
 csclng is a compiler wrapper that runs the Clang analyzer in background.
 
 
+csgcca
+------
+csgcca is a compiler wrapper that runs the GCC analyzer in background.
+
+
 csmatch
 -------
 csmatch is an experimental compiler wrapper that runs smatch in background.

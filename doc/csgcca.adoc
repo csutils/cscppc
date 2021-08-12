@@ -1,0 +1,106 @@
+csgcca(1)
+=========
+:doctype: manpage
+
+NAME
+----
+csgcca - a compiler wrapper that runs the GCC analyzer in background
+
+
+SYNOPSIS
+--------
+*csgcca* ['--help' | '--print-path-to-wrap']
+
+
+DESCRIPTION
+-----------
+csgcca is a compiler wrapper that runs 'gcc -fanalyzer' in background.  Create
+a symbolic link to csgcca named as your compiler and put it to your $PATH.
+
+The following parameters are given to the GCC analyzer by default:
+
+    * -fanalyzer
+
+    * -fdiagnostics-path-format=separate-events
+
+    * -fno-diagnostics-show-caret
+
+    * -c -o /dev/null
+
+The following parameters are passed to the GCC analyzer from compiler's command
+line:
+
+    * -D...
+
+    * -I...
+
+    * -include ...
+
+    * -iquote ...
+
+    * -isystem ...
+
+    * -m16
+
+    * -m32
+
+    * -m64
+
+    * -fexceptions
+
+    * -fno-exceptions
+
+    * -O...
+
+    * -std...
+
+If csgcca is installed on system, the following command activates the wrapper:
+-------------------------------------------------
+export PATH="`csgcca --print-path-to-wrap`:$PATH"
+-------------------------------------------------
+
+
+OPTIONS
+-------
+*--help*::
+    Prints basic usage information.
+
+*--print-path-to-wrap*::
+    Prints path to the directory with symlinks to the csgcca executable.
+
+
+EXIT STATUS
+-----------
+csgcca propagates the exit status returned by the compiler (in case csgcca
+succeeds to run the compiler).  The exit status returned by the GCC analyzer
+does not affect the resulting exit status.
+
+
+ENVIRONMENT VARIABLES
+---------------------
+*DEBUG_CSGCCA*::
+    If set to a non-empty string, csgcca outputs the list of parameters given
+    to the GCC analyzer to the standard output.
+
+*CSGCCA_ADD_OPTS*::
+    csgcca expects a colon-separated list of GCC options that should be
+    appended to command line prior to invoking the GCC analyzer.  The options
+    are appended even if they already appear in the command line and they are
+    always appended at the end of the command line.
+
+
+BUGS
+----
+Please report bugs and feature requests at https://github.com/kdudka/cscppc .
+
+
+AUTHOR
+------
+Written by Kamil Dudka.
+
+
+COPYING
+-------
+Copyright \(C) 2020-2021 Red Hat, Inc. Free use of this software is granted
+under the terms of the GNU General Public License (GPL).  See the COPYING file
+for details.

@@ -200,6 +200,7 @@ done
 %files -n csgcca
 %{_bindir}/csgcca
 %{_libdir}/csgcca
+%{_mandir}/man1/csgcca.1*
 %doc COPYING
 
 %files -n csmatch
