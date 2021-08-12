@@ -1,3 +1,3 @@
 [submodule "cswrap"]
 	path = cswrap
-	url = https://github.com/kdudka/cswrap.git
+	url = https://github.com/csutils/cswrap.git

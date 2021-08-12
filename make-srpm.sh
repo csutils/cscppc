@@ -47,7 +47,7 @@ VER="`echo "$VER" | sed "s/-.*-/.$TIMESTAMP./"`"
 
 BRANCH="`git rev-parse --abbrev-ref HEAD`"
 test -n "$BRANCH" || die "failed to get current branch name"
-test master = "${BRANCH}" || VER="${VER}.${BRANCH}"
+test "main" = "${BRANCH}" || VER="${VER}.${BRANCH}"
 test -z "`git diff HEAD`" || VER="${VER}.dirty"
 
 NV="${PKG}-${VER}"
@@ -85,8 +85,8 @@ Summary:    A compiler wrapper that runs cppcheck in background
 
 Group:      Development/Tools
 License:    GPLv3+
-URL:        https://github.com/kdudka/%{name}
-Source0:    https://github.com/kdudka/%{name}/releases/download/%{name}-%{version}/%{name}-%{version}.tar.xz
+URL:        https://github.com/csutils/%{name}
+Source0:    https://github.com/csutils/%{name}/releases/download/%{name}-%{version}/%{name}-%{version}.tar.xz
 
 BuildRequires: asciidoc
 BuildRequires: cmake

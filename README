@@ -5,7 +5,7 @@ symbolic link to cscppc named as your compiler (gcc, g++, ...) and put it
 to your $PATH.  cscppc --help prints usage to standard error output.  You
 can find the up2date sources in the following repository:
 
-    https://github.com/kdudka/cscppc
+    https://github.com/csutils/cscppc
 
 cscppc is licensed under GPLv3+, see COPYING for details.  Please report bugs
 and feature requests on GitHub using the above URL.
