@@ -393,8 +393,14 @@ static void consider_running_analyzer(
         return;
     }
 
+    const char *analyzer = NULL;
+    if (analyzer_bin_envvar)
+        analyzer = getenv(analyzer_bin_envvar);
+    if (!analyzer || !analyzer[0])
+        analyzer = analyzer_name;
+
     /* make sure that the analyzer process is named analyzer_name */
-    argv[0] = (char *) analyzer_name;
+    argv[0] = (char *) analyzer;
 
     /* make sure there is NULL at the end of argv[] */
     argv[argc_total - 1] = NULL;
@@ -410,7 +416,7 @@ static void consider_running_analyzer(
     }
 
     /* try to start analyzer */
-    pid_analyzer = launch_tool(analyzer_name, argv, /* del_args */ NULL);
+    pid_analyzer = launch_tool(analyzer, argv, /* del_args */ NULL);
 
     /* FIXME: release also the memory allocated by asprintf() and
        read_custom_opts() */
