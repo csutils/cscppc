@@ -34,6 +34,13 @@ extern const char *wrapper_debug_envvar_name;
 
 extern const char *analyzer_name;
 
+/**
+ * The name of the environment variable which value is the path (relative or
+ * absolute) to the analyzer binary. If value of the environment variable is
+ * non-empty string, it's used to override the value of analyzer_name.
+ */
+extern const char *analyzer_bin_envvar_name;
+
 extern const bool analyzer_is_cxx_ready;
 
 extern const bool analyzer_is_gcc_compatible;

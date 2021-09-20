@@ -37,6 +37,8 @@ const char *wrapper_debug_envvar_name = "DEBUG_CSCLNG";
 
 const char *analyzer_name = "clang";
 
+const char *analyzer_bin_envvar_name = NULL;
+
 const bool analyzer_is_cxx_ready = true;
 
 const bool analyzer_is_gcc_compatible = true;
