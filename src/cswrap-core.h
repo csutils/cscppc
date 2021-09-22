@@ -35,19 +35,11 @@ extern const char *wrapper_debug_envvar_name;
 extern const char *analyzer_name;
 
 /**
- * Environment variable name which is used
- * to determine how to start analyzer.
- * The value can be NULL.
- * If value is NULL or specified environment
- * variable is not set or it has empty string
- * as it's value, the string provided in
- * analyzer_name will be used to run analyzer
- *
- * Note: this environment variable value
- * doesn't need to provide parameters to
- * run analyzer, just the binary it self.
+ * The name of the environment variable which value is the path (relative or
+ * absolute) to the analyzer binary. If value of the environment variable is
+ * non-empty string it's used to override the value if analyzer_name.
  */
-extern const char *analyzer_bin_envvar;
+extern const char *analyzer_bin_envvar_name;
 
 extern const bool analyzer_is_cxx_ready;
 

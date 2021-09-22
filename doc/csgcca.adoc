@@ -88,6 +88,10 @@ ENVIRONMENT VARIABLES
     are appended even if they already appear in the command line and they are
     always appended at the end of the command line.
 
+*CSGCCA_ANALYZER_BIN*::
+    If set to a non-empty string, csgcca will use the value as a path (relative
+    or absolute) to analyzer binary.
+
 
 BUGS
 ----

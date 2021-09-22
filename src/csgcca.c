@@ -37,7 +37,7 @@ const char *wrapper_debug_envvar_name = "DEBUG_CSGCCA";
 
 const char *analyzer_name = "gcc";
 
-const char *analyzer_bin_envvar = "CSGCCA_ANALYZER_BIN";
+const char *analyzer_bin_envvar_name = "CSGCCA_ANALYZER_BIN";
 
 const bool analyzer_is_cxx_ready = false;
 
