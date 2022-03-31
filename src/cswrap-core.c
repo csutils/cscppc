@@ -217,6 +217,21 @@ static bool is_bare_def_inc(const char *arg)
                     || STREQ(arg, "-isystem")));
 }
 
+static bool is_forwardable_gcc_flag(const char *arg)
+{
+    if (STREQ(arg, "-m16") || STREQ(arg, "-m32") || STREQ(arg, "-m64"))
+        return true;
+
+    if (STREQ(arg, "-fexceptions") || STREQ(arg, "-fno-exceptions"))
+        return true;
+
+    if (MATCH_PREFIX(arg, "-O") || MATCH_PREFIX(arg, "-std"))
+        return true;
+
+    /* no match */
+    return false;
+}
+
 static int /* args remain */ drop_arg(int *pargc, char **argv, const int i)
 {
     const int argc = --(*pargc);
@@ -261,11 +276,7 @@ static int translate_args_for_analyzer(int argc, char **argv)
         }
 
         if (analyzer_is_gcc_compatible) {
-            if (STREQ(arg, "-m16") || STREQ(arg, "-m32") || STREQ(arg, "-m64")
-                    || STREQ(arg, "-fexceptions")
-                    || STREQ(arg, "-fno-exceptions")
-                    || MATCH_PREFIX(arg, "-O")
-                    || MATCH_PREFIX(arg, "-std"))
+            if (is_forwardable_gcc_flag(arg))
                 /* pass -m{16,32,64} and the like directly to the analyzer */
                 continue;
 
