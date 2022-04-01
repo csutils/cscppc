@@ -228,10 +228,15 @@ static bool is_forwardable_gcc_flag(const char *arg)
     if (MATCH_PREFIX(arg, "-O") || MATCH_PREFIX(arg, "-std"))
         return true;
 
-    if (STREQ(analyzer_name, "gcc") &&
-            (MATCH_PREFIX(arg, "-Wno-") || MATCH_PREFIX(arg, "-fno-")))
+    if (STREQ(analyzer_name, "gcc")) {
+        /* pass all -f* flags to gcc analyzer to avoid spurious warnings */
+        if (MATCH_PREFIX(arg, "-f"))
+            return true;
+
         /* warnings suppressed in gcc should be suppressed in analyzer, too */
-        return true;
+        if (MATCH_PREFIX(arg, "-Wno-"))
+            return true;
+    }
 
     /* no match */
     return false;
