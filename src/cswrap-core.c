@@ -262,7 +262,7 @@ static int translate_args_for_analyzer(int argc, char **argv)
             /* preprocessing --> bypass analyzer in order to not break ccache */
             return -1;
 
-        if (STREQ(arg, "-MM"))
+        if (MATCH_PREFIX(arg, "-M"))
             /* tracking includes --> bypass the analyzer to save resources */
             return -1;
 
