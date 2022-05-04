@@ -1,4 +1,4 @@
-# Copyright (C) 2014 Red Hat, Inc.
+# Copyright (C) 2014 - 2022 Red Hat, Inc.
 #
 # This file is part of cscppc.
 #
@@ -20,11 +20,14 @@ NUM_CPU ?= $(shell getconf _NPROCESSORS_ONLN 2>/dev/null || echo 1)
 CMAKE ?= cmake
 CTEST ?= ctest -j$(NUM_CPU)
 
+CMAKE_BUILD_TYPE ?= RelWithDebInfo
+
 .PHONY: all check clean distclean distcheck install
 
 all:
 	mkdir -p cscppc_build
-	cd cscppc_build && $(CMAKE) ..
+	cd cscppc_build && $(CMAKE) \
+		-DCMAKE_BUILD_TYPE="$(CMAKE_BUILD_TYPE)" ..
 	$(MAKE) -sC cscppc_build -j$(NUM_CPU)
 
 check: all
