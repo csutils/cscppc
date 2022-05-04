@@ -1,4 +1,4 @@
-# Copyright (C) 2014 - 2021 Red Hat, Inc.
+# Copyright (C) 2014 - 2022 Red Hat, Inc.
 #
 # This file is part of cscppc.
 #
@@ -14,6 +14,13 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with cscppc.  If not, see <http://www.gnu.org/licenses/>.
+message(STATUS "User-provided flags: ${CMAKE_C_FLAGS}")
+
+# set flags
+set(CMAKE_C_STANDARD 99)
+set(CMAKE_C_STANDARD_REQUIRED ON)
+set(CMAKE_C_EXTENSIONS OFF)
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra")
 
 # make sure that waitid() is available
 include(CheckFunctionExists)
