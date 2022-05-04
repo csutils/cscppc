@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2014 Red Hat, Inc.
+ * Copyright (C) 2013-2022 Red Hat, Inc.
  *
  * This file is part of cscppc.
  *
@@ -47,6 +47,13 @@ static const char *analyzer_def_arg_list[] = {
     "-fanalyzer",
     "-fdiagnostics-path-format=separate-events",
     "-fno-diagnostics-show-caret",
+
+    /* GCC analyzer does not fully support LTO at the moment.  Additionally,
+     * due to a bug it uses SSA names of the variables (e.g. current_3 instead
+     * of current) in this mode.
+     *
+     * See: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=94976 */
+    "-fno-lto",
 
     /* do not create any object files, only emit diagnostic messages */
     "-c",
