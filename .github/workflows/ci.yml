@@ -1,0 +1,51 @@
+---
+name: Ubuntu CI
+
+on:
+  push:
+    branches: main
+  pull_request:
+    branches: main
+
+jobs:
+  ubuntu:
+    name: Ubuntu ${{ matrix.version }} (${{ matrix.compiler }})
+    strategy:
+      fail-fast: false
+      matrix:
+        compiler: [clang++, g++]
+        version: [18.04, 20.04]
+
+    runs-on: ubuntu-${{ matrix.version }}
+    env:
+      CXX: ${{ matrix.compiler }}
+      DEBIAN_FRONTEND: noninteractive
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y cmake valgrind
+
+      - name: '[Focal] Add sanitizers to CXXFLAGS'
+        if: matrix.version >= 20.04
+        run: |
+          # Use ASAN and UBSAN
+          CXXFLAGS="-fsanitize=address,undefined"
+          # Recommended for better error traces
+          CXXFLAGS="$CXXFLAGS -fno-omit-frame-pointer"
+          # Make UBSAN reports fatal
+          CXXFLAGS="$CXXFLAGS -fno-sanitize-recover=all"
+
+          # Make UBSAN print whole stack traces
+          UBSAN_OPTIONS="print_stacktrace=1"
+
+          # Store the env variables
+          echo "CXXFLAGS=$CXXFLAGS" >> "$GITHUB_ENV"
+          echo "UBSAN_OPTIONS=$UBSAN_OPTIONS" >> "$GITHUB_ENV"
+
+      - name: Build and check
+        run: make distcheck
