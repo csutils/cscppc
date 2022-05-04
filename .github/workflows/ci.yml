@@ -1,0 +1,53 @@
+---
+name: Ubuntu CI
+
+on:
+  push:
+    branches: main
+  pull_request:
+    branches: main
+
+jobs:
+  ubuntu:
+    name: Ubuntu ${{ matrix.version }} (${{ matrix.compiler }})
+    strategy:
+      fail-fast: false
+      matrix:
+        compiler: [clang, gcc]
+        version: [18.04, 20.04]
+
+    runs-on: ubuntu-${{ matrix.version }}
+    env:
+      CC: ${{ matrix.compiler }}
+      DEBIAN_FRONTEND: noninteractive
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+
+      - name: '[Focal] Add sanitizers to CFLAGS'
+        if: matrix.version >= 20.04
+        run: |
+          # Use ASAN and UBSAN
+          CFLAGS="-fsanitize=address,undefined"
+          # Recommended for better error traces
+          CFLAGS="$CFLAGS -fno-omit-frame-pointer"
+          # Make UBSAN reports fatal
+          CFLAGS="$CFLAGS -fno-sanitize-recover=all"
+
+          # FIXME: release also the memory allocated by asprintf() and
+          # read_custom_opts()
+          ASAN_OPTIONS="detect_leaks=0"
+
+          # Make UBSAN print whole stack traces
+          UBSAN_OPTIONS="print_stacktrace=1"
+
+          # Store the env variables
+          echo "CFLAGS=$CFLAGS" >> "$GITHUB_ENV"
+          echo "ASAN_OPTIONS=$ASAN_OPTIONS" >> "$GITHUB_ENV"
+          echo "UBSAN_OPTIONS=$UBSAN_OPTIONS" >> "$GITHUB_ENV"
+
+      - name: Build and check
+        run: make distcheck
