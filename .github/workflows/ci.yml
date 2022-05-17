@@ -26,6 +26,12 @@ jobs:
         with:
           submodules: true
 
+      - name: '[clang] Install a default version for Ubuntu ${{ matrix.version }}'
+        if: matrix.compiler == 'clang'
+        run: |
+          sudo apt update
+          sudo apt install -y clang
+
       - name: '[Jammy] Add sanitizers to CFLAGS'
         if: matrix.version >= 22.04
         run: |
