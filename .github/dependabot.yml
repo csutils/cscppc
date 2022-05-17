@@ -4,7 +4,7 @@ updates:
     # Files stored in repository root
     directory: "/"
     schedule:
-      interval: "daily"
+      interval: "monthly"
     reviewers:
       - "kdudka"
 
