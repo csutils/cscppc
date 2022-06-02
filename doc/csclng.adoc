@@ -24,11 +24,19 @@ The following parameters are given to clang by default:
 
     * -Xanalyzer -analyzer-output=text
 
+    * -fno-caret-diagnostics
+
 The following parameters are passed to clang from compiler's command line:
 
     * -D...
 
     * -I...
+
+    * -O...
+
+    * -fexceptions
+
+    * -fno-exceptions
 
     * -include ...
 
@@ -41,12 +49,6 @@ The following parameters are passed to clang from compiler's command line:
     * -m32
 
     * -m64
-
-    * -fexceptions
-
-    * -fno-exceptions
-
-    * -O...
 
     * -std...
 

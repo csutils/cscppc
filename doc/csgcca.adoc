@@ -25,6 +25,8 @@ The following parameters are given to the GCC analyzer by default:
 
     * -fno-diagnostics-show-caret
 
+    * -fno-lto
+
     * -c -o /dev/null
 
 The following parameters are passed to the GCC analyzer from compiler's command
@@ -33,6 +35,12 @@ line:
     * -D...
 
     * -I...
+
+    * -O...
+
+    * -Wno-...
+
+    * -f...
 
     * -include ...
 
@@ -45,12 +53,6 @@ line:
     * -m32
 
     * -m64
-
-    * -fexceptions
-
-    * -fno-exceptions
-
-    * -O...
 
     * -std...
 

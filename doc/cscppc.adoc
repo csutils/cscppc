@@ -32,11 +32,13 @@ The following parameters are given to cppcheck by default:
 
     * -D__WORDSIZE=64{nbsp}                         [64bit architecture only]
 
+    * -D\__CPPCHECK__
+
     * --inline-suppr
 
     * --quiet
 
-    * --template="\{file}:\{line}: \{severity}: \{id}: \{message}"
+    * --template="\{file}:\{line}: \{severity}: \{id}(CWE-\{cwe}): \{message}"
 
     * --suppressions-list=/usr/share/cscppc/default.supp
 
