@@ -111,6 +111,6 @@ Written by Kamil Dudka.
 
 COPYING
 -------
-Copyright \(C) 2013-2014 Red Hat, Inc. Free use of this software is granted
+Copyright \(C) 2013-2022 Red Hat, Inc. Free use of this software is granted
 under the terms of the GNU General Public License (GPL).  See the COPYING file
 for details.
