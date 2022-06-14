@@ -1,4 +1,4 @@
-# Copyright (C) 2014 - 2021 Red Hat, Inc.
+# Copyright (C) 2014 - 2022 Red Hat, Inc.
 #
 # This file is part of cscppc.
 #
@@ -32,5 +32,6 @@ if(A2X)
     add_man_page(csclng)
     add_man_page(cscppc)
     add_man_page(csgcca)
+    add_man_page(csmatch)
     add_custom_target(doc ALL DEPENDS ${man_pages})
 endif()

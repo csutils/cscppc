@@ -1,0 +1,112 @@
+csmatch(1)
+=========
+:doctype: manpage
+
+NAME
+----
+csmatch - a compiler wrapper that runs the smatch analyzer in background
+
+
+SYNOPSIS
+--------
+*csmatch* ['--help' | '--print-path-to-wrap']
+
+
+DESCRIPTION
+-----------
+csmatch is a compiler wrapper that runs smatch in background.  Create a
+symbolic link to csmatch named as your compiler (gcc, g++, ...) and put it
+to your $PATH.
+
+The following parameters are given to smatch by default:
+
+    * -D_Float128=long double
+
+The following parameters are passed to smatch from compiler's command line:
+
+    * -D...
+
+    * -I...
+
+    * -O...
+
+    * -fexceptions
+
+    * -fno-exceptions
+
+    * -include ...
+
+    * -iquote ...
+
+    * -isystem ...
+
+    * -m16
+
+    * -m32
+
+    * -m64
+
+    * -std...
+
+The following file extensions are recognized as C/C++ source files:
+
+    * c
+
+    * C
+
+    * cc
+
+    * cpp
+
+    * cxx
+
+If csmatch is installed on system, the following command activates the wrapper:
+-------------------------------------------------
+export PATH="`csmatch --print-path-to-wrap`:$PATH"
+-------------------------------------------------
+
+
+OPTIONS
+-------
+*--help*::
+    Prints basic usage information.
+
+*--print-path-to-wrap*::
+    Prints path to the directory with symlinks to the csmatch executable.
+
+
+EXIT STATUS
+-----------
+csmatch propagates the exit status returned by the compiler (in case csmatch
+succeeds to run the compiler).  The exit status returned by smatch does not
+affect the resulting exit status.
+
+
+ENVIRONMENT VARIABLES
+---------------------
+*DEBUG_CSMATCH*::
+    If set to a non-empty string, csmatch outputs the list of parameters given
+    to smatch to the standard output.
+
+*CSMATCH_ADD_OPTS*::
+    csmatch expects a colon-separated list of smatch options that should be
+    appended to command line prior to invoking smatch.  The options are
+    appended even if they already appear in the command line and they are
+    always appended at the end of the command line.
+
+
+BUGS
+----
+Please report bugs and feature requests at https://github.com/csutils/cscppc.
+
+
+AUTHOR
+------
+Written by Kamil Dudka.
+
+
+COPYING
+-------
+Copyright \(C) 2013-2022 Red Hat, Inc. Free use of this software is granted
+under the terms of the GNU General Public License (GPL).  See the COPYING file
+for details.
