@@ -47,22 +47,25 @@ VER="`echo "$VER" | sed "s/-.*-/.$TIMESTAMP./"`"
 
 BRANCH="`git rev-parse --abbrev-ref HEAD`"
 test -n "$BRANCH" || die "failed to get current branch name"
-test "main" = "${BRANCH}" || VER="${VER}.${BRANCH//-/_}"
+test "main" = "${BRANCH}" || VER="${VER}.${BRANCH//[\/-]/_}"
 test -z "`git diff HEAD`" || VER="${VER}.dirty"
 
 NV="${PKG}-${VER}"
 printf "%s: preparing a release of \033[1;32m%s\033[0m\n" "$SELF" "$NV"
 
+SPEC="$PKG.spec"
 TMP="`mktemp -d`"
 trap "rm -rf '$TMP'" EXIT
-cd "$TMP" >/dev/null || die "mktemp failed"
+pushd "$TMP" >/dev/null || die "mktemp failed"
 
 # clone the repository
 git clone --recurse-submodules "$REPO" "$PKG" \
                                         || die "git clone failed"
-cd "$PKG"                               || die "git clone failed"
+pushd "$PKG"                            || die "git clone failed"
 
-make distcheck                          || die "'make distcheck' has failed"
+if [[ "$1" != "--generate-sources" ]]; then
+    make distcheck                          || die "'make distcheck' has failed"
+fi
 
 SRC_TAR="${NV}.tar"
 SRC="${SRC_TAR}.xz"
@@ -73,10 +76,17 @@ git archive --prefix="$NV/" --format="tar" HEAD -- . > "${TMP}/${SRC_TAR}" \
                                         || die "failed to export submodule"
 tar -Af "${TMP}/${SRC_TAR}" cswrap-util.tar \
                                         || die "failed to concatenate TAR"
-cd "$TMP" >/dev/null                    || die "mktemp failed"
-xz -c "$SRC_TAR" > "$SRC"               || die "failed to compress sources"
+popd >/dev/null                         || die "mktemp failed"
+xz -c "${TMP}/${SRC_TAR}" > "${TMP}/${SRC}" \
+                                        || die "failed to compress sources"
 
-SPEC="$TMP/$PKG.spec"
+if [[ "$1" == "--generate-sources" ]]; then
+    popd > /dev/null
+    mv "${TMP}/${SRC}" .
+else
+    SPEC="$TMP/$SPEC"
+fi
+
 cat > "$SPEC" << EOF
 Name:       $PKG
 Version:    $VER
@@ -210,7 +220,9 @@ done
 %doc COPYING
 EOF
 
-rpmbuild -bs "$SPEC"                            \
-    --define "_sourcedir $TMP"                  \
-    --define "_specdir $TMP"                    \
-    --define "_srcrpmdir $DST"
+if [[ "$1" != "--generate-sources" ]]; then
+    rpmbuild -bs "$SPEC"                            \
+        --define "_sourcedir $TMP"                  \
+        --define "_specdir $TMP"                    \
+        --define "_srcrpmdir $DST"
+fi
