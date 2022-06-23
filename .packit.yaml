@@ -36,5 +36,5 @@ jobs:
     - <<: *copr
       trigger: commit
       owner: "@codescan"
-      project: "cscppc"
+      project: "csutils"
       branch: main
