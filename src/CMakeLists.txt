@@ -25,8 +25,7 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -pedantic")
 # make sure that waitid() is available
 include(CheckFunctionExists)
 check_function_exists(waitid HAVE_WAITID_FUNCTION)
-if(HAVE_WAITID_FUNCTION)
-else()
+if(NOT HAVE_WAITID_FUNCTION)
     message(FATAL_ERROR "
 required waitid() function not found")
 endif()
