@@ -1,4 +1,4 @@
-# Copyright (C) 2014 - 2021 Red Hat, Inc.
+# Copyright (C) 2014 - 2022 Red Hat, Inc.
 #
 # This file is part of cscppc.
 #
@@ -16,4 +16,6 @@
 # along with cscppc.  If not, see <http://www.gnu.org/licenses/>.
 
 # install default.supp (suppression file for cppcheck)
-install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cscppc DESTINATION share)
+include(GNUInstallDirs)
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cscppc
+        DESTINATION ${CMAKE_INSTALL_DATADIR})

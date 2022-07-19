@@ -51,4 +51,7 @@ add_executable(csclng csclng.c)
 add_executable(csclng++ ${CMAKE_CURRENT_BINARY_DIR}/csclng++.c)
 add_executable(csgcca csgcca.c)
 add_executable(csmatch csmatch.c)
-install(TARGETS cscppc csclng csclng++ csgcca csmatch DESTINATION bin)
+
+include(GNUInstallDirs)
+install(TARGETS cscppc csclng csclng++ csgcca csmatch
+        DESTINATION ${CMAKE_INSTALL_BINDIR})

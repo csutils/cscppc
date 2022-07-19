@@ -22,8 +22,10 @@ macro(add_man_page tool)
         DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${tool}.adoc
         COMMENT "Generating ${tool}.1 man page...")
     set(man_pages ${man_pages} ${CMAKE_CURRENT_BINARY_DIR}/${tool}.1)
+
+    include(GNUInstallDirs)
     install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${tool}.1
-        DESTINATION share/man/man1)
+            DESTINATION ${CMAKE_INSTALL_MANDIR}/man1)
 endmacro()
 
 # build and install man pages (if asciidoc is available)
