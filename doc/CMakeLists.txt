@@ -17,7 +17,7 @@
 
 macro(add_man_page tool)
     add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${tool}.1
-        COMMAND a2x -f manpage ${CMAKE_CURRENT_SOURCE_DIR}/${tool}.adoc
+        COMMAND ${A2X} -f manpage ${CMAKE_CURRENT_SOURCE_DIR}/${tool}.adoc
         -D ${CMAKE_CURRENT_BINARY_DIR}
         DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${tool}.adoc
         COMMENT "Generating ${tool}.1 man page...")
