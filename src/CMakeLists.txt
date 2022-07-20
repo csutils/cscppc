@@ -44,13 +44,27 @@ add_definitions(-iquote ${CMAKE_SOURCE_DIR})
 add_library(cswrap STATIC cswrap-core.c ../cswrap/src/cswrap-util.c)
 link_libraries(cswrap)
 
-# compile and install executables
-add_executable(cscppc cscppc.c)
-add_executable(csclng csclng.c)
-add_executable(csclng++ ${CMAKE_CURRENT_BINARY_DIR}/csclng++.c)
-add_executable(csgcca csgcca.c)
-add_executable(csmatch csmatch.c)
-
+# use automatic detection of installation directories
 include(GNUInstallDirs)
-install(TARGETS cscppc csclng csclng++ csgcca csmatch
-        DESTINATION ${CMAKE_INSTALL_BINDIR})
+
+# compile and install executables
+macro(add_cs_executable name sources)
+    add_executable(${name} ${sources})
+
+    # get the suffix of the PATH_TO_CSXXX variable
+    string(TOUPPER ${name} name_upper)
+    string(REGEX REPLACE "\\+\\+$" "" name_upper ${name_upper})
+
+    if(PATH_TO_${name_upper})
+        target_compile_definitions(${name}
+            PRIVATE -DPATH_TO_${name_upper}=${PATH_TO_${name_upper}})
+    endif()
+
+    install(TARGETS ${name} DESTINATION ${CMAKE_INSTALL_BINDIR})
+endmacro()
+
+add_cs_executable(cscppc cscppc.c)
+add_cs_executable(csclng csclng.c)
+add_cs_executable(csclng++ ${CMAKE_CURRENT_BINARY_DIR}/csclng++.c)
+add_cs_executable(csgcca csgcca.c)
+add_cs_executable(csmatch csmatch.c)

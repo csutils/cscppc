@@ -161,12 +161,12 @@ in background fully transparently.
 mkdir cscppc_build
 cd cscppc_build
 export CFLAGS="\$RPM_OPT_FLAGS"
-CFLAGS="\$CFLAGS"' -DPATH_TO_CSCPPC=\\"%{_libdir}/cscppc\\"'
-CFLAGS="\$CFLAGS"' -DPATH_TO_CSCLNG=\\"%{_libdir}/csclng\\"'
-CFLAGS="\$CFLAGS"' -DPATH_TO_CSGCCA=\\"%{_libdir}/csgcca\\"'
-CFLAGS="\$CFLAGS"' -DPATH_TO_CSMATCH=\\"%{_libdir}/csmatch\\"'
 export LDFLAGS="\$RPM_OPT_FLAGS -static -pthread"
-%cmake .. -S.. -B.
+%cmake .. -S.. -B.                            \\
+    -DPATH_TO_CSCPPC=\"%{_libdir}/cscppc\"    \\
+    -DPATH_TO_CSCLNG=\"%{_libdir}/csclng\"    \\
+    -DPATH_TO_CSGCCA=\"%{_libdir}/csgcca\"    \\
+    -DPATH_TO_CSMATCH=\"%{_libdir}/csmatch\"
 make %{?_smp_mflags} VERBOSE=yes
 
 %check
