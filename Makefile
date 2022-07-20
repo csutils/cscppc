@@ -20,15 +20,21 @@ NUM_CPU ?= $(shell getconf _NPROCESSORS_ONLN 2>/dev/null || echo 1)
 CMAKE ?= cmake
 CTEST ?= ctest -j$(NUM_CPU)
 
+STATIC ?= OFF
+
 CMAKE_BUILD_TYPE ?= RelWithDebInfo
 
-.PHONY: all check clean distclean distcheck install
+.PHONY: all check clean static distclean distcheck distcheck-static install
 
 all:
 	mkdir -p cscppc_build
 	cd cscppc_build && $(CMAKE) \
-		-DCMAKE_BUILD_TYPE="$(CMAKE_BUILD_TYPE)" ..
+		-DCMAKE_BUILD_TYPE="$(CMAKE_BUILD_TYPE)" \
+		-DSTATIC_LINKING="$(STATIC)" ..
 	$(MAKE) -sC cscppc_build -j$(NUM_CPU)
+
+static:
+	$(MAKE) -s all STATIC=ON
 
 check: all
 	cd cscppc_build && $(CTEST) --output-on-failure
@@ -41,6 +47,9 @@ distclean:
 
 distcheck: distclean
 	$(MAKE) -s check
+
+distcheck-static:
+	$(MAKE) -s distcheck STATIC=ON
 
 install: all
 	$(MAKE) -C cscppc_build install

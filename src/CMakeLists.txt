@@ -22,6 +22,27 @@ set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_C_EXTENSIONS OFF)
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -pedantic")
 
+# link to libc statically
+option(STATIC_LINKING "Link to libc statically" OFF)
+if(STATIC_LINKING)
+    set(STATIC_FLAG "-static")
+
+    # unfortunately, CMAKE_REQUIRED_LINK_OPTIONS was introduced in CMake 3.14
+    # so we have to abuse CMAKE_EXE_LINKER_FLAGS instead.
+    set(CMAKE_EXE_LINKER_FLAGS_BAK "${CMAKE_EXE_LINKER_FLAGS}")
+
+    # check that the compiler supports generation of static PIE executables
+    include(CheckCCompilerFlag)
+    set(CMAKE_EXE_LINKER_FLAGS "-static-pie")
+    check_c_compiler_flag(-static-pie HAVE_STATIC_PIE)
+    if(HAVE_STATIC_PIE)
+        set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+        set(STATIC_FLAG "-static-pie")
+    endif()
+
+    set(CMAKE_EXE_LINKER_FLAGS "${STATIC_FLAG} ${CMAKE_EXE_LINKER_FLAGS_BAK}")
+endif()
+
 # make sure that waitid() is available
 include(CheckFunctionExists)
 check_function_exists(waitid HAVE_WAITID_FUNCTION)

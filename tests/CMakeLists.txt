@@ -1,4 +1,4 @@
-# Copyright (C) 2014 - 2021 Red Hat, Inc.
+# Copyright (C) 2014 - 2022 Red Hat, Inc.
 #
 # This file is part of cscppc.
 #
@@ -25,4 +25,5 @@ foreach(runtest ${runtests})
     add_test("${test_name}" "${runtest}" "${test_src_dir}"
         "${CMAKE_CURRENT_BINARY_DIR}/${test_name}/"
         "${CMAKE_BINARY_DIR}/src")
+    set_tests_properties("${test_name}" PROPERTIES SKIP_RETURN_CODE 42)
 endforeach()
