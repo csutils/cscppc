@@ -4,7 +4,7 @@ csmatch(1)
 
 NAME
 ----
-csmatch - a compiler wrapper that runs the smatch analyzer in background
+csmatch - a compiler wrapper that runs the Smatch analyzer in background
 
 
 SYNOPSIS
@@ -14,15 +14,15 @@ SYNOPSIS
 
 DESCRIPTION
 -----------
-csmatch is a compiler wrapper that runs smatch in background.  Create a
+csmatch is a compiler wrapper that runs Smatch in background.  Create a
 symbolic link to csmatch named as your compiler (gcc, g++, ...) and put it
 to your $PATH.
 
-The following parameters are given to smatch by default:
+The following parameters are given to Smatch by default:
 
     * -D_Float128=long double
 
-The following parameters are passed to smatch from compiler's command line:
+The following parameters are passed to Smatch from compiler's command line:
 
     * -D...
 
@@ -62,7 +62,7 @@ The following file extensions are recognized as C/C++ source files:
 
 If csmatch is installed on system, the following command activates the wrapper:
 -------------------------------------------------
-export PATH="`csmatch --print-path-to-wrap`:$PATH"
+export PATH="$(csmatch --print-path-to-wrap):$PATH"
 -------------------------------------------------
 
 
@@ -78,7 +78,7 @@ OPTIONS
 EXIT STATUS
 -----------
 csmatch propagates the exit status returned by the compiler (in case csmatch
-succeeds to run the compiler).  The exit status returned by smatch does not
+succeeds to run the compiler).  The exit status returned by Smatch does not
 affect the resulting exit status.
 
 
@@ -86,11 +86,11 @@ ENVIRONMENT VARIABLES
 ---------------------
 *DEBUG_CSMATCH*::
     If set to a non-empty string, csmatch outputs the list of parameters given
-    to smatch to the standard output.
+    to Smatch to the standard output.
 
 *CSMATCH_ADD_OPTS*::
-    csmatch expects a colon-separated list of smatch options that should be
-    appended to command line prior to invoking smatch.  The options are
+    csmatch expects a colon-separated list of Smatch options that should be
+    appended to command line prior to invoking Smatch.  The options are
     appended even if they already appear in the command line and they are
     always appended at the end of the command line.
 

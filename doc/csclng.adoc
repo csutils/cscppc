@@ -14,11 +14,11 @@ SYNOPSIS
 
 DESCRIPTION
 -----------
-csclng is a compiler wrapper that runs clang in background.  Create a
+csclng is a compiler wrapper that runs Clang in background.  Create a
 symbolic link to csclng named as your compiler (gcc, g++, ...) and put it
 to your $PATH.
 
-The following parameters are given to clang by default:
+The following parameters are given to Clang by default:
 
     * --analyze
 
@@ -26,7 +26,7 @@ The following parameters are given to clang by default:
 
     * -fno-caret-diagnostics
 
-The following parameters are passed to clang from compiler's command line:
+The following parameters are passed to Clang from compiler's command line:
 
     * -D...
 
@@ -66,7 +66,7 @@ The following file extensions are recognized as C/C++ source files:
 
 If csclng is installed on system, the following command activates the wrapper:
 -------------------------------------------------
-export PATH="`csclng --print-path-to-wrap`:$PATH"
+export PATH="$(csclng --print-path-to-wrap):$PATH"
 -------------------------------------------------
 
 
@@ -82,7 +82,7 @@ OPTIONS
 EXIT STATUS
 -----------
 csclng propagates the exit status returned by the compiler (in case csclng
-succeeds to run the compiler).  The exit status returned by clang does not
+succeeds to run the compiler).  The exit status returned by Clang does not
 affect the resulting exit status.
 
 
@@ -90,7 +90,7 @@ ENVIRONMENT VARIABLES
 ---------------------
 *DEBUG_CSCLNG*::
     If set to a non-empty string, csclng outputs the list of parameters given
-    to clang to the standard output.
+    to Clang to the standard output.
 
 *CSCLNG_ADD_OPTS*::
     csclng expects a colon-separated list of Clang options that should be
@@ -101,7 +101,7 @@ ENVIRONMENT VARIABLES
 
 BUGS
 ----
-Please report bugs and feature requests at https://github.com/csutils/cscppc .
+Please report bugs and feature requests at https://github.com/csutils/cscppc.
 
 
 AUTHOR

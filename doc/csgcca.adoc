@@ -58,7 +58,7 @@ line:
 
 If csgcca is installed on system, the following command activates the wrapper:
 -------------------------------------------------
-export PATH="`csgcca --print-path-to-wrap`:$PATH"
+export PATH="$(csgcca --print-path-to-wrap):$PATH"
 -------------------------------------------------
 
 
@@ -97,7 +97,7 @@ ENVIRONMENT VARIABLES
 
 BUGS
 ----
-Please report bugs and feature requests at https://github.com/csutils/cscppc .
+Please report bugs and feature requests at https://github.com/csutils/cscppc.
 
 
 AUTHOR
