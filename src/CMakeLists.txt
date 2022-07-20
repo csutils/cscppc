@@ -22,6 +22,17 @@ set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_C_EXTENSIONS OFF)
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -pedantic")
 
+# enable sanitizers
+option(SANITIZERS "Compile with ASan and UBSan" OFF)
+if (SANITIZERS)
+    # enable ASan and UBSan
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fsanitize=address,undefined")
+    # recommended for better error traces
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-omit-frame-pointer")
+    # make UBSan reports fatal
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-sanitize-recover=all")
+endif()
+
 # link to libc statically
 option(STATIC_LINKING "Link to libc statically" OFF)
 if(STATIC_LINKING)

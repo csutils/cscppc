@@ -21,20 +21,26 @@ CMAKE ?= cmake
 CTEST ?= ctest -j$(NUM_CPU)
 
 STATIC ?= OFF
+SANITIZERS ?= OFF
 
 CMAKE_BUILD_TYPE ?= RelWithDebInfo
 
-.PHONY: all check clean static distclean distcheck distcheck-static install
+.PHONY: all check clean static sanitizers distclean distcheck \
+	distcheck-static distcheck-sanitizers install
 
 all:
 	mkdir -p cscppc_build
 	cd cscppc_build && $(CMAKE) \
 		-DCMAKE_BUILD_TYPE="$(CMAKE_BUILD_TYPE)" \
-		-DSTATIC_LINKING="$(STATIC)" ..
+		-DSTATIC_LINKING="$(STATIC)" \
+		-DSANITIZERS="$(SANITIZERS)" ..
 	$(MAKE) -sC cscppc_build -j$(NUM_CPU)
 
 static:
 	$(MAKE) -s all STATIC=ON
+
+sanitizers:
+	$(MAKE) -s all SANITIZERS=ON
 
 check: all
 	cd cscppc_build && $(CTEST) --output-on-failure
@@ -50,6 +56,9 @@ distcheck: distclean
 
 distcheck-static:
 	$(MAKE) -s distcheck STATIC=ON
+
+distcheck-sanitizers:
+	$(MAKE) -s distcheck SANITIZERS=ON
 
 install: all
 	$(MAKE) -C cscppc_build install

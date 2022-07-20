@@ -29,7 +29,7 @@ ln -fs "$PATH_TO_WRAP/csclng++" csclng++/g++                        || exit $?
 
 # run the wrappers through valgrind if available
 EXEC_PREFIX=
-if valgrind --version; then
+if [[ "$HAS_SANITIZERS" -eq 1 ]] && valgrind --version; then
     EXEC_PREFIX="valgrind -q --undef-value-errors=no --error-exitcode=7"
     printf "%s " "$EXEC_PREFIX" >> tools/g++
     printf "%s " "$EXEC_PREFIX" >> tools/gcc

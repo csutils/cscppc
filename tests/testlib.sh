@@ -12,6 +12,20 @@ TEST_DST_DIR="$2"
 # path to binaries of the wrappers
 PATH_TO_WRAP="$3"
 
+# sanitizer build is used
+grep -q "SANITIZERS:BOOL=ON" "$PATH_TO_WRAP/../CMakeCache.txt"
+HAS_SANITIZERS="$?"
+
+if [[ "$HAS_SANITIZERS" -eq 0 ]]; then
+    # make UBSan print whole stack traces
+    export UBSAN_OPTIONS="print_stacktrace=1"
+
+    # disable LSan because the fork&exec machinery in 0003-translation-of-args
+    # test produces incomplete stack traces making the leak suppression of
+    # these deliberate leaks useless on some distributions (Arch, Ubuntu, ...)
+    export ASAN_OPTIONS="detect_leaks=0"
+fi
+
 # create $TEST_DST_DIR (if it does not exist already)
 mkdir -p "$TEST_DST_DIR" || exit $?
 
