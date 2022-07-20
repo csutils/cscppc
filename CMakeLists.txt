@@ -1,4 +1,4 @@
-# Copyright (C) 2014 - 2021 Red Hat, Inc.
+# Copyright (C) 2014 - 2022 Red Hat, Inc.
 #
 # This file is part of cscppc.
 #
@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with cscppc.  If not, see <http://www.gnu.org/licenses/>.
 
-cmake_minimum_required(VERSION 2.8.12)
+cmake_minimum_required(VERSION 3.4)
 project(cscppc C)
 enable_testing()
 

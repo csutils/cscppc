@@ -99,7 +99,7 @@ URL:        https://github.com/csutils/%{name}
 Source0:    https://github.com/csutils/%{name}/releases/download/%{name}-%{version}/%{name}-%{version}.tar.xz
 
 BuildRequires: asciidoc
-BuildRequires: cmake
+BuildRequires: cmake3
 BuildRequires: gcc
 
 # The test-suite runs automatically trough valgrind if valgrind is available
@@ -162,7 +162,7 @@ mkdir cscppc_build
 cd cscppc_build
 export CFLAGS="\$RPM_OPT_FLAGS"
 export LDFLAGS="\$RPM_OPT_FLAGS -static -pthread"
-%cmake .. -S.. -B.                            \\
+%cmake3 .. -S.. -B.                           \\
     -DPATH_TO_CSCPPC=\"%{_libdir}/cscppc\"    \\
     -DPATH_TO_CSCLNG=\"%{_libdir}/csclng\"    \\
     -DPATH_TO_CSGCCA=\"%{_libdir}/csgcca\"    \\
@@ -171,7 +171,7 @@ make %{?_smp_mflags} VERBOSE=yes
 
 %check
 cd cscppc_build
-ctest %{?_smp_mflags} --output-on-failure
+ctest3 %{?_smp_mflags} --output-on-failure
 
 %install
 cd cscppc_build
