@@ -176,20 +176,20 @@ in background fully transparently.
 %install
 %cmake3_install
 
-install -m0755 -d "\$RPM_BUILD_ROOT%{_libdir}"{,/cs{cppc,clng,gcca,match}}
+install -m0755 -d "%{buildroot}%{_libdir}"{,/cs{cppc,clng,gcca,match}}
 
 for i in cc gcc %{_arch}-redhat-linux-gcc
 do
-    ln -s ../../bin/cscppc "\$RPM_BUILD_ROOT%{_libdir}/cscppc/\$i"
-    ln -s ../../bin/csclng "\$RPM_BUILD_ROOT%{_libdir}/csclng/\$i"
-    ln -s ../../bin/csgcca "\$RPM_BUILD_ROOT%{_libdir}/csgcca/\$i"
-    ln -s ../../bin/csmatch "\$RPM_BUILD_ROOT%{_libdir}/csmatch/\$i"
+    ln -s ../../bin/cscppc  "%{buildroot}%{_libdir}/cscppc/\$i"
+    ln -s ../../bin/csclng  "%{buildroot}%{_libdir}/csclng/\$i"
+    ln -s ../../bin/csgcca  "%{buildroot}%{_libdir}/csgcca/\$i"
+    ln -s ../../bin/csmatch "%{buildroot}%{_libdir}/csmatch/\$i"
 done
 
 for i in c++ g++ %{_arch}-redhat-linux-c++ %{_arch}-redhat-linux-g++
 do
-    ln -s ../../bin/cscppc   "\$RPM_BUILD_ROOT%{_libdir}/cscppc/\$i"
-    ln -s ../../bin/csclng++ "\$RPM_BUILD_ROOT%{_libdir}/csclng/\$i"
+    ln -s ../../bin/cscppc   "%{buildroot}%{_libdir}/cscppc/\$i"
+    ln -s ../../bin/csclng++ "%{buildroot}%{_libdir}/csclng/\$i"
 done
 
 %files
