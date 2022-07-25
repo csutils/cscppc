@@ -155,7 +155,7 @@ This package contains the csmatch compiler wrapper that runs the smatch analyzer
 in background fully transparently.
 
 %prep
-%setup -q
+%autosetup
 
 %build
 mkdir cscppc_build
