@@ -106,6 +106,12 @@ BuildRequires: asciidoc
 BuildRequires: cmake3
 BuildRequires: gcc
 
+# csmock copies the resulting cscppc binary into mock chroot, which may contain
+# an older (e.g. RHEL-7) version of glibc, and it would not dynamically link
+# against the old version of glibc if it was built against a newer one.
+# Therefore, we link glibc statically.
+BuildRequires: glibc-static
+
 # The test-suite runs automatically trough valgrind if valgrind is available
 # on the system.  By not installing valgrind into mock's chroot, we disable
 # this feature for production builds on architectures where valgrind is known
@@ -114,14 +120,6 @@ BuildRequires: gcc
 # valgrind manually to improve test coverage on any architecture.
 %ifarch %{ix86} x86_64
 BuildRequires: valgrind
-%endif
-
-# csmock copies the resulting cscppc binary into mock chroot, which may contain
-# an older (e.g. RHEL-5) version of glibc, and it would not dynamically link
-# against the old version of glibc if it was built against a newer one.
-# Therefor we link glibc statically.
-%if (0%{?fedora} >= 12 || 0%{?rhel} >= 6)
-BuildRequires: glibc-static
 %endif
 
 # the {cwe} field in --template option is supported since cppcheck-1.85
