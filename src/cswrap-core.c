@@ -62,7 +62,7 @@ static int usage(char *argv[])
         : analyzer_name;
 
     fprintf(stderr, "Usage:\n\
-    export PATH=\"`%s --print-path-to-wrap`:$PATH\"\n\n\
+    export PATH=\"$(%s --print-path-to-wrap):$PATH\"\n\n\
     %s is a compiler wrapper that runs %s in background.  Create\n\
     a symbolic link to %s named as your compiler (gcc, g++, ...) and put it\n\
     to your $PATH.  %s --help prints this text to standard error output.\n",
