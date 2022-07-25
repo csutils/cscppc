@@ -97,7 +97,6 @@ Version:    $VER
 Release:    1%{?dist}
 Summary:    A compiler wrapper that runs cppcheck in background
 
-Group:      Development/Tools
 License:    GPLv3+
 URL:        https://github.com/csutils/%{name}
 Source0:    https://github.com/csutils/%{name}/releases/download/%{name}-%{version}/%{name}-%{version}.tar.xz
