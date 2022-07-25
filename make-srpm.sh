@@ -88,6 +88,10 @@ else
 fi
 
 cat > "$SPEC" << EOF
+# Disable in source builds on EPEL <9
+%undefine __cmake_in_source_build
+%undefine __cmake3_in_source_build
+
 Name:       $PKG
 Version:    $VER
 Release:    1%{?dist}
@@ -158,23 +162,19 @@ in background fully transparently.
 %autosetup
 
 %build
-mkdir cscppc_build
-cd cscppc_build
-%cmake3 .. -S.. -B.                           \\
+%cmake3                                       \\
     -DPATH_TO_CSCPPC=\"%{_libdir}/cscppc\"    \\
     -DPATH_TO_CSCLNG=\"%{_libdir}/csclng\"    \\
     -DPATH_TO_CSGCCA=\"%{_libdir}/csgcca\"    \\
     -DPATH_TO_CSMATCH=\"%{_libdir}/csmatch\"  \\
     -DSTATIC_LINKING=ON
-make %{?_smp_mflags} VERBOSE=yes
+%cmake3_build
 
 %check
-cd cscppc_build
-ctest3 %{?_smp_mflags} --output-on-failure
+%ctest3
 
 %install
-cd cscppc_build
-make install DESTDIR="\$RPM_BUILD_ROOT"
+%cmake3_install
 
 install -m0755 -d "\$RPM_BUILD_ROOT%{_libdir}"{,/cs{cppc,clng,gcca,match}}
 
