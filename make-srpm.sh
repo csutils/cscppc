@@ -95,7 +95,7 @@ cat > "$SPEC" << EOF
 Name:       $PKG
 Version:    $VER
 Release:    1%{?dist}
-Summary:    A compiler wrapper that runs cppcheck in background
+Summary:    A compiler wrapper that runs Cppcheck in background
 
 License:    GPLv3+
 URL:        https://github.com/csutils/%{name}
@@ -128,7 +128,7 @@ Requires: cppcheck >= 1.85
 Conflicts: csdiff < 1.8.0
 
 %description
-This package contains the cscppc compiler wrapper that runs cppcheck in
+This package contains the cscppc compiler wrapper that runs Cppcheck in
 background fully transparently.
 
 %package -n csclng
@@ -148,11 +148,11 @@ This package contains the csgcca compiler wrapper that runs 'gcc -fanalyzer'
 in background fully transparently.
 
 %package -n csmatch
-Summary: A compiler wrapper that runs smatch in background
+Summary: A compiler wrapper that runs Smatch in background
 Requires: clang
 
 %description -n csmatch
-This package contains the csmatch compiler wrapper that runs the smatch analyzer
+This package contains the csmatch compiler wrapper that runs the Smatch analyzer
 in background fully transparently.
 
 %prep
