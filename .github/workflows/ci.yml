@@ -27,11 +27,14 @@ jobs:
         with:
           submodules: true
 
-      - name: '[clang] Install a default version for Ubuntu ${{ matrix.version }}'
-        if: matrix.compiler == 'clang'
+      - name: Install dependecies
         run: |
           sudo apt update
-          sudo apt install -y clang
+          sudo apt install -y asciidoc-base
+
+      - name: '[clang] Install a default version for Ubuntu ${{ matrix.version }}'
+        if: matrix.compiler == 'clang'
+        run: sudo apt install -y clang
 
       - name: Build and check
         run: |
