@@ -141,10 +141,10 @@ This package contains the csclng compiler wrapper that runs the Clang analyzer
 in background fully transparently.
 
 %package -n csgcca
-Summary: A compiler wrapper that runs 'gcc -fanalyzer' in background
+Summary: A compiler wrapper that runs GCC analyzer in background
 
 %description -n csgcca
-This package contains the csgcca compiler wrapper that runs 'gcc -fanalyzer'
+This package contains the csgcca compiler wrapper that runs GCC analyzer
 in background fully transparently.
 
 %package -n csmatch
