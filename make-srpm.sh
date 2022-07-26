@@ -142,6 +142,7 @@ in background fully transparently.
 
 %package -n csgcca
 Summary: A compiler wrapper that runs GCC analyzer in background
+Requires: gcc
 
 %description -n csgcca
 This package contains the csgcca compiler wrapper that runs GCC analyzer
@@ -149,7 +150,7 @@ in background fully transparently.
 
 %package -n csmatch
 Summary: A compiler wrapper that runs Smatch in background
-Requires: clang
+# Requires: smatch  (not in Fedora yet)
 
 %description -n csmatch
 This package contains the csmatch compiler wrapper that runs the Smatch analyzer
