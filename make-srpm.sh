@@ -191,30 +191,31 @@ do
 done
 
 %files
+%license COPYING
+%doc README
 %{_bindir}/cscppc
 %{_datadir}/cscppc
 %{_libdir}/cscppc
 %{_mandir}/man1/%{name}.1*
-%doc COPYING README
 
 %files -n csclng
+%license COPYING
 %{_bindir}/csclng
 %{_bindir}/csclng++
 %{_libdir}/csclng
 %{_mandir}/man1/csclng.1*
-%doc COPYING
 
 %files -n csgcca
+%license COPYING
 %{_bindir}/csgcca
 %{_libdir}/csgcca
 %{_mandir}/man1/csgcca.1*
-%doc COPYING
 
 %files -n csmatch
+%license COPYING
 %{_bindir}/csmatch
 %{_libdir}/csmatch
 %{_mandir}/man1/csmatch.1*
-%doc COPYING
 EOF
 
 if [[ "$1" != "--generate-sources" ]]; then
