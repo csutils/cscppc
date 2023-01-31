@@ -15,7 +15,7 @@ downstream_package_name: cscppc
 
 srpm_build_deps: [rpm-build]
 
-release_suffix: ""
+update_release: false
 actions:
     post-upstream-clone: ./make-srpm.sh --generate-sources
     create-archive: bash -c "ls -1 ./cscppc-*.tar.xz"
