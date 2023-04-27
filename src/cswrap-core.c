@@ -262,8 +262,8 @@ static int translate_args_for_analyzer(int argc, char **argv)
             /* preprocessing --> bypass analyzer in order to not break ccache */
             return -1;
 
-        if (MATCH_PREFIX(arg, "-M"))
-            /* tracking includes --> bypass the analyzer to save resources */
+        if (STREQ(arg, "-M") || STREQ(arg, "-MM"))
+            /* -M and -MM (unlike -MD and -MMD) imply -E (preprocessor only) */
             return -1;
 
         if (is_def_inc(arg)) {
