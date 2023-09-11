@@ -150,7 +150,7 @@ in background fully transparently.
 
 %package -n csmatch
 Summary: A compiler wrapper that runs Smatch in background
-# Requires: smatch  (not in Fedora yet)
+Recommends: smatch
 
 %description -n csmatch
 This package contains the csmatch compiler wrapper that runs the Smatch analyzer
