@@ -178,7 +178,7 @@ in background fully transparently.
 
 install -m0755 -d "%{buildroot}%{_libdir}"{,/cs{cppc,clng,gcca,match}}
 
-for i in cc gcc %{_arch}-redhat-linux-gcc
+for i in {,g}cc clang %{_arch}-redhat-linux-gcc
 do
     ln -s ../../bin/cscppc  "%{buildroot}%{_libdir}/cscppc/\$i"
     ln -s ../../bin/csclng  "%{buildroot}%{_libdir}/csclng/\$i"
@@ -186,7 +186,7 @@ do
     ln -s ../../bin/csmatch "%{buildroot}%{_libdir}/csmatch/\$i"
 done
 
-for i in c++ g++ %{_arch}-redhat-linux-c++ %{_arch}-redhat-linux-g++
+for i in {c,g,clang}++ %{_arch}-redhat-linux-{c,g}++
 do
     ln -s ../../bin/cscppc   "%{buildroot}%{_libdir}/cscppc/\$i"
     ln -s ../../bin/csclng++ "%{buildroot}%{_libdir}/csclng/\$i"
