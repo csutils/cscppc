@@ -88,8 +88,9 @@ macro(add_cs_executable name sources)
     string(REGEX REPLACE "\\+\\+$" "" name_upper ${name_upper})
 
     if(PATH_TO_${name_upper})
-        target_compile_definitions(${name}
-            PRIVATE -DPATH_TO_${name_upper}=${PATH_TO_${name_upper}})
+        set(def -DPATH_TO_${name_upper}=${PATH_TO_${name_upper}})
+        target_compile_definitions(cswrap PRIVATE ${def})
+        target_compile_definitions(${name} PRIVATE ${def})
     endif()
 
     install(TARGETS ${name} DESTINATION ${CMAKE_INSTALL_BINDIR})

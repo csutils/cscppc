@@ -366,6 +366,61 @@ static bool read_custom_opts(char **dst, const char *str)
     }
 }
 
+#if defined(PATH_TO_CSCLNG) || defined(PATH_TO_CSGCCA) \
+    || defined(PATH_TO_CSMATCH) || defined(PATH_TO_CSCPPC)
+/* if `path` starts with `prefix`, remove the prefix and the trailing ':' */
+static bool remove_path_prefix(char *path, const char *prefix)
+{
+    const size_t prefix_len = strlen(prefix);
+    if (strncmp(path, prefix, prefix_len))
+        // prefix not found
+        return false;
+
+    // skip all ':' that follow the prefix
+    const char *end = path + prefix_len;
+    while (*end == ':')
+        ++end;
+
+    // remove the prefix, including the trailing double dots
+    const size_t new_size = strlen(end) + /* NUL */ 1;
+    memmove(path, end, new_size);
+    return true;
+}
+
+/* if `path` starts with path to a known wrapper, remove the prefix */
+static bool remove_known_wrapper_from_path(char *path)
+{
+    bool removed = false;
+#ifdef PATH_TO_CSCLNG
+    removed |= remove_path_prefix(path, PATH_TO_CSCLNG);
+#endif
+#ifdef PATH_TO_CSGCCA
+    removed |= remove_path_prefix(path, PATH_TO_CSGCCA);
+#endif
+#ifdef PATH_TO_CSMATCH
+    removed |= remove_path_prefix(path, PATH_TO_CSMATCH);
+#endif
+#ifdef PATH_TO_CSCPPC
+    removed |= remove_path_prefix(path, PATH_TO_CSCPPC);
+#endif
+    return removed;
+}
+
+/* remove paths to known wrappers from the beginning of $PATH */
+static void sanitize_path_for_analyzer(void)
+{
+    char *path = getenv("PATH");
+    if (!path || !*path)
+        return;
+
+    /* the `path` string will be modified in place */
+    while (remove_known_wrapper_from_path(path))
+        ;
+}
+#else
+#   define sanitize_path_for_analyzer()
+#endif
+
 static void consider_running_analyzer(
         const int                   argc_orig,
         char **const                argv_orig)
@@ -437,6 +492,7 @@ static void consider_running_analyzer(
     }
 
     /* try to start analyzer */
+    sanitize_path_for_analyzer();
     pid_analyzer = launch_tool(analyzer_name_actual, argv, /* del_args */ NULL);
 
     /* FIXME: release also the memory allocated by asprintf() and
