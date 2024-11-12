@@ -121,8 +121,11 @@ BuildRequires: glibc-static
 BuildRequires: valgrind
 %endif
 
+%if 0%{?rhel} != 7
+# cscppc is linked statically and can be used by csmock in chroot environment
 # the {cwe} field in --template option is supported since cppcheck-1.85
-Requires: cppcheck >= 1.85
+Recommends: cppcheck >= 1.85
+%endif
 
 # older versions of csdiff do not read CWE numbers from Cppcheck output
 Conflicts: csdiff < 1.8.0
