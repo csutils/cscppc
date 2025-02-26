@@ -9,12 +9,12 @@ on:
 
 jobs:
   ubuntu:
-    name: Ubuntu ${{ matrix.version }} (${{ matrix.compiler }}${{ matrix.version == 22.04 && ' with sanitizers' || '' }})
+    name: Ubuntu ${{ matrix.version }} (${{ matrix.compiler }}${{ matrix.version == 24.04 && ' with sanitizers' || '' }})
     strategy:
       fail-fast: false
       matrix:
         compiler: [clang, gcc]
-        version: [22.04]
+        version: [22.04, 24.04]
 
     runs-on: ubuntu-${{ matrix.version }}
     env:
@@ -38,7 +38,7 @@ jobs:
 
       - name: Build and check
         run: |
-          if [[ "${{ matrix.version }}" == 22.04 ]]; then
+          if [[ "${{ matrix.version }}" == 24.04 ]]; then
             make distcheck-sanitizers
           else
             make distcheck
